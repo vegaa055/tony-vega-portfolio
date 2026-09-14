@@ -4,7 +4,8 @@ import Link from "next/link";
 type SectionHeadingProps<T extends string> = {
   /** Used by the section's aria-labelledby. */
   id: string;
-  index: string;
+  /** Optional catalog number, e.g. "01". */
+  index?: string;
   title: string;
   link?: { href: Route<T>; label: string };
 };
@@ -22,10 +23,12 @@ export function SectionHeading<T extends string>({
         className="font-mono text-[0.72rem] tracking-[0.2em] text-dust uppercase"
       >
         {/* The catalog number is decoration; the heading's name is the title. */}
-        <span aria-hidden="true">
-          <span className="text-flare">{index}</span>{" "}
-          <span className="text-faint">/</span>{" "}
-        </span>
+        {index ? (
+          <span aria-hidden="true">
+            <span className="text-flare">{index}</span>{" "}
+            <span className="text-faint">/</span>{" "}
+          </span>
+        ) : null}
         {title}
       </h2>
       {link ? (

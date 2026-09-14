@@ -28,6 +28,9 @@ export type ContentImage = {
   url: string;
   alt: string;
   caption?: string;
+  /** Intrinsic size in pixels, so pages can reserve space before it loads. */
+  width?: number;
+  height?: number;
 };
 
 const timestamps = {

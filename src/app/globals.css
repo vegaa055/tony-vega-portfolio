@@ -81,27 +81,29 @@
 
 @layer components {
   /* Fixed deep-space backdrop. Two star tiles of different sizes (so their
-     repeats never line up) plus faint nebular light in opposite corners. */
-  .deep-field {
+     repeats never line up) plus faint nebular light in opposite corners.
+     Keep this class name unique: Markdown content can carry its own classes
+     (Shiki, for one, adds its theme name to every code block). */
+  .starfield {
     position: fixed;
     inset: 0;
     z-index: -10;
     pointer-events: none;
   }
 
-  .deep-field::before,
-  .deep-field::after {
+  .starfield::before,
+  .starfield::after {
     content: "";
     position: absolute;
     inset: 0;
   }
 
-  .deep-field::before {
+  .starfield::before {
     background: url("/stars-far.svg") 0 0 / 1100px 1100px repeat;
     opacity: 0.8;
   }
 
-  .deep-field::after {
+  .starfield::after {
     background:
       url("/stars-near.svg") 0 0 / 1700px 1700px repeat,
       radial-gradient(
@@ -114,6 +116,296 @@
         rgb(255 106 77 / 0.06),
         transparent 60%
       );
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Long-form content rendered from Markdown (see src/lib/markdown)        */
+  /* ---------------------------------------------------------------------- */
+
+  .prose-field {
+    color: var(--color-dust);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+  }
+
+  /* Dims the starfield behind dense text so stars don't land on letters.
+     Feathered on every side, so it reads as depth rather than a panel.
+     Markdown content gets it automatically; add .reading-backdrop elsewhere. */
+  .prose-field,
+  .reading-backdrop {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .prose-field::before,
+  .reading-backdrop::before {
+    content: "";
+    position: absolute;
+    inset: -2rem -1rem;
+    z-index: -1;
+    background-color: rgb(5 6 10 / 0.86);
+    pointer-events: none;
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent,
+        black 2rem,
+        black calc(100% - 2rem),
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        transparent,
+        black 2rem,
+        black calc(100% - 2rem),
+        transparent
+      );
+    mask-composite: intersect;
+  }
+
+  @media (min-width: 40rem) {
+    .prose-field::before,
+    .reading-backdrop::before {
+      inset: -2.5rem -3rem;
+    }
+  }
+
+  .prose-field > :first-child {
+    margin-top: 0;
+  }
+
+  .prose-field :where(p, ul, ol, blockquote, .table-scroll) {
+    margin-top: 1.25em;
+  }
+
+  /* Section headings read like instrument labels: small, mono, ruled. */
+  .prose-field :where(h2) {
+    margin-top: 2.75em;
+    border-top: 1px solid var(--color-line);
+    padding-top: 1.25em;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-star);
+  }
+
+  .prose-field :where(h3) {
+    margin-top: 2em;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--color-star);
+  }
+
+  .prose-field :where(h4) {
+    margin-top: 1.75em;
+    font-weight: 600;
+    color: var(--color-star);
+  }
+
+  .prose-field :where(h2, h3, h4) {
+    scroll-margin-top: 6rem;
+  }
+
+  .prose-field :where(h2, h3, h4) + * {
+    margin-top: 0.9em;
+  }
+
+  .prose-field .heading-anchor {
+    margin-left: 0.5em;
+    color: var(--color-faint);
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .prose-field :where(h2, h3):hover .heading-anchor {
+    opacity: 1;
+  }
+
+  .prose-field .heading-anchor:hover {
+    color: var(--color-flare);
+  }
+
+  .prose-field :where(a) {
+    color: var(--color-star);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(
+      in srgb,
+      var(--color-flare) 55%,
+      transparent
+    );
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    transition: text-decoration-color 0.3s;
+  }
+
+  .prose-field :where(a:hover) {
+    text-decoration-color: var(--color-flare);
+  }
+
+  .prose-field :where(strong) {
+    font-weight: 600;
+    color: var(--color-star);
+  }
+
+  .prose-field :where(ul, ol) {
+    padding-left: 1.4em;
+  }
+
+  .prose-field :where(ul) {
+    list-style: square;
+  }
+
+  .prose-field :where(ol) {
+    list-style: decimal;
+  }
+
+  .prose-field :where(li) {
+    padding-left: 0.35em;
+  }
+
+  .prose-field :where(li + li, li > ul, li > ol) {
+    margin-top: 0.45em;
+  }
+
+  .prose-field :where(ul > li)::marker {
+    color: var(--color-flare);
+  }
+
+  .prose-field :where(ol > li)::marker {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--color-faint);
+  }
+
+  .prose-field :where(.contains-task-list) {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .prose-field :where(input[type="checkbox"]) {
+    margin-right: 0.5em;
+    accent-color: var(--color-flare);
+  }
+
+  .prose-field :where(blockquote) {
+    border-left: 2px solid var(--color-flare);
+    padding-left: 1.25em;
+    color: var(--color-star);
+  }
+
+  .prose-field :where(hr) {
+    margin-block: 3em;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .prose-field :where(code):not(pre code) {
+    border: 1px solid var(--color-line);
+    border-radius: 2px;
+    background-color: var(--color-nebula);
+    padding: 0.1em 0.35em;
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--color-star);
+  }
+
+  /* Code blocks. Colors come from the deep-field-code Shiki theme; the condensed
+     width of Martian Mono fits more of each line. */
+  .prose-field :where(pre) {
+    position: relative;
+    margin-top: 1.75em;
+    overflow-x: auto;
+    border: 1px solid var(--color-line);
+    padding: 2.4rem 1.25rem 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-stretch: 87.5%;
+    line-height: 1.75;
+    tab-size: 2;
+  }
+
+  .prose-field :where(pre:not([data-language])) {
+    padding-top: 1.25rem;
+  }
+
+  .prose-field :where(pre[data-language])::before {
+    content: attr(data-language);
+    position: absolute;
+    top: 0.8rem;
+    left: 1.25rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .prose-field :where(figure) {
+    margin-block: 2em;
+  }
+
+  .prose-field :where(img) {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-line);
+  }
+
+  .prose-field :where(figcaption) {
+    margin-top: 0.75em;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+  }
+
+  .prose-field :where(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .prose-field :where(th) {
+    border-bottom: 1px solid var(--color-line-strong);
+    padding: 0 1em 0.7em 0;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-faint);
+  }
+
+  .prose-field :where(td) {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.65em 1em 0.65em 0;
+    vertical-align: top;
+  }
+
+  .prose-field :where(th[align="right"], td[align="right"]) {
+    text-align: right;
+  }
+
+  .prose-field :where(th[align="center"], td[align="center"]) {
+    text-align: center;
+  }
+
+  .prose-field :where(.footnotes) {
+    margin-top: 3em;
+    border-top: 1px solid var(--color-line);
+    padding-top: 1.5em;
+    font-size: 0.9rem;
   }
 
   /* Instrument-panel dot grid that fades out toward the edges. */

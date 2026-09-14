@@ -46,15 +46,16 @@ Defined in `src/db/schema.ts`.
 - [x] Home, Projects, Blog, About, and 404 pages with empty states
 - [x] Lint, type check, and production build pass
 
-### Phase 2: Public site
+### Phase 2: Public site ✅
 
-- [ ] Markdown rendering: code highlighting, sanitized HTML, heading anchors
-- [ ] Data layer: cached reads (`use cache` + `cacheLife` + `cacheTag`)
-- [ ] Home: featured projects and latest posts
-- [ ] Projects index with tag filter, and a page per project
-- [ ] Blog index and post pages
-- [ ] About page from the database
-- [ ] Seed script: 4 featured projects (from `featured-projects-ref/`), 10 older projects as drafts, About content from the old sites, one sample post
+- [x] Markdown rendering: sanitized HTML, Shiki code highlighting (custom theme), linkable headings, image figures, tables
+- [x] Data layer: cached reads (`use cache` + `cacheLife("max")` + tags from `src/lib/cache-tags.ts`)
+- [x] Home: featured projects and latest posts
+- [x] Projects index with a tag filter kept in the URL (`?tag=audio`), and a page per project with specs, contents, gallery, and previous/next links
+- [x] Blog index and post pages
+- [x] About page from the database: bio, portrait, skills, experience timeline
+- [x] Seed script (`npm run db:seed`): 4 featured projects, 10 older projects as drafts, About content, 1 published post and 1 draft
+- [x] Real 404s for drafts and unknown slugs; production build works with an empty database and a seeded one
 
 ### Phase 3: Admin panel
 
@@ -88,15 +89,30 @@ fallback.
 
 Things discovered in Phase 1 that will matter later.
 
-- **Phase 2, seed script:** `src/db/index.ts` imports `server-only`, which throws
-  in plain Node scripts. Give the seed script its own Drizzle client (or run it
-  with `--conditions=react-server`).
-- **Phase 2, dynamic routes:** `NavLink` calls `usePathname()`. Check that
-  `/projects/[slug]` and `/blog/[slug]` still prerender cleanly; wrap in
-  `<Suspense>` if Next.js asks for it.
-- **Phase 2, caching:** the footer's `cacheLife("days")` caps every page's
-  revalidation at one day. That's intended (a daily safety refresh), but content
-  caches should still use tags so admin edits show up immediately.
+- **Caching:** the footer's `cacheLife("days")` caps every page's revalidation
+  at one day. That's intended (a daily safety refresh). Admin saves must still
+  revalidate the matching tags in `src/lib/cache-tags.ts` so edits show up
+  immediately: a project save revalidates `projects` and `project:<slug>`.
+- **Phase 3, slugs:** `src/lib/static-params.ts` prerenders the slug `_none`
+  when nothing is published (Cache Components fails the build on an empty
+  `generateStaticParams`). Admin slug validation must use `SLUG_PATTERN` from
+  `src/lib/slug.ts`, which can never produce that placeholder.
+- **Phase 3, dates:** project cards show the year of `publishedAt`. When
+  publishing an older draft (e.g. Space Force), let the editor set that date.
+- **Detail pages block on purpose:** `/projects/[slug]` and `/blog/[slug]` look
+  up content before rendering, so drafts and unknown slugs return real 404s.
+  They export `instant = false` to acknowledge Next.js's instant-navigation
+  warning. If navigation ever feels slow in production, add `prefetch` to the
+  card links rather than wrapping the pages in `<Suspense>`.
+- **Class name collisions:** Shiki adds its theme name as a class on every code
+  block (`deep-field-code`). An earlier theme name matched the starfield's class
+  and broke code blocks, so keep site classes and Markdown output distinct.
+- **Seed script:** it has its own Drizzle client because `src/db/index.ts`
+  imports `server-only`, which throws outside Next.js. It never overwrites
+  existing rows unless run with `--force`.
+- **Dev image optimizer:** if a cover image never loads in `next dev` after
+  navigating away mid-load, restart the dev server. It's a dev-only stuck
+  request on a slow disk; production uses Vercel's image optimization.
 - **Phase 3, auth:** don't rely on `proxy.ts` alone for protection; check the
   session in the admin layout and in every Server Action. Adding a proxy file can
   also cause `usePathname()` hydration mismatches on prerendered pages (see the

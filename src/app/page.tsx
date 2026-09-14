@@ -1,8 +1,12 @@
 import { ButtonLink } from "@/components/button-link";
 import { EmptyState } from "@/components/empty-state";
 import { HeroScene } from "@/components/hero/hero-scene";
+import { PostList } from "@/components/post-list";
+import { ProjectCard } from "@/components/project-card";
 import { SectionHeading } from "@/components/section-heading";
 import { siteConfig } from "@/config/site";
+import { getLatestPosts } from "@/data/posts";
+import { getFeaturedProjects, getPublishedProjects } from "@/data/projects";
 
 export default function HomePage() {
   return (
@@ -66,10 +70,8 @@ export default function HomePage() {
           title="Selected work"
           link={{ href: "/projects", label: "All projects" }}
         />
-        <div className="mt-10">
-          <EmptyState title="No projects published yet">
-            Featured projects will appear here.
-          </EmptyState>
+        <div className="mt-12">
+          <FeaturedProjects />
         </div>
       </section>
 
@@ -83,12 +85,55 @@ export default function HomePage() {
           title="Latest writing"
           link={{ href: "/blog", label: "All posts" }}
         />
-        <div className="mt-10">
-          <EmptyState title="No posts yet">
-            New posts will appear here.
-          </EmptyState>
+        <div className="mt-2">
+          <LatestWriting />
         </div>
       </section>
     </>
   );
+}
+
+async function FeaturedProjects() {
+  const [featured, all] = await Promise.all([
+    getFeaturedProjects(),
+    getPublishedProjects(),
+  ]);
+
+  if (featured.length === 0) {
+    return (
+      <EmptyState title="No projects published yet">
+        Featured projects will appear here.
+      </EmptyState>
+    );
+  }
+
+  return (
+    <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2">
+      {featured.map((project) => (
+        <li key={project.slug}>
+          <ProjectCard
+            project={project}
+            // Same catalog number the project has on the projects page.
+            position={all.findIndex((p) => p.slug === project.slug) + 1}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+async function LatestWriting() {
+  const posts = await getLatestPosts(3);
+
+  if (posts.length === 0) {
+    return (
+      <div className="mt-8">
+        <EmptyState title="No posts yet">
+          New posts will appear here.
+        </EmptyState>
+      </div>
+    );
+  }
+
+  return <PostList posts={posts} />;
 }

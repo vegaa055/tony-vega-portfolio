@@ -20,5 +20,6 @@ export const siteConfig = {
   nav,
   links: {
     github: "https://github.com/vegaa055",
+    linkedin: "https://www.linkedin.com/in/tonyvega1983/",
   },
 };

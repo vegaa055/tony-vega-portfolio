@@ -37,17 +37,22 @@ export function SiteFooter() {
               </Link>
             </li>
           ))}
-          <li>
-            <a
-              href={siteConfig.links.github}
-              target="_blank"
-              rel="noreferrer"
-              className={linkClass}
-            >
-              GitHub <span aria-hidden="true">↗</span>
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </li>
+          {[
+            { href: siteConfig.links.github, label: "GitHub" },
+            { href: siteConfig.links.linkedin, label: "LinkedIn" },
+          ].map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className={linkClass}
+              >
+                {link.label} <span aria-hidden="true">↗</span>
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </footer>

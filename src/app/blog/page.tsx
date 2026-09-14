@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { PostList } from "@/components/post-list";
+import { getPublishedPosts } from "@/data/posts";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -9,7 +11,9 @@ export const metadata: Metadata = {
     "Notes from Tony Vega on building things: what worked, what broke, and what it taught.",
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getPublishedPosts();
+
   return (
     <>
       <PageHeader
@@ -18,10 +22,14 @@ export default function BlogPage() {
         title="Blog"
         description="Notes on building things: what worked, what broke, and what it taught."
       />
-      <div className="mx-auto max-w-site px-4 py-16 sm:px-8 sm:py-20">
-        <EmptyState title="No posts yet">
-          The first entry is on its way.
-        </EmptyState>
+      <div className="mx-auto max-w-site px-4 py-14 sm:px-8 sm:py-20">
+        {posts.length === 0 ? (
+          <EmptyState title="No posts yet">
+            The first entry is on its way.
+          </EmptyState>
+        ) : (
+          <PostList posts={posts} headingLevel="h2" />
+        )}
       </div>
     </>
   );

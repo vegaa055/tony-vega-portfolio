@@ -1,0 +1,8 @@
+.next
+node_modules
+drizzle
+public
+package-lock.json
+next-env.d.ts
+# Markdown is hand-formatted (and AGENTS.md is managed by Next.js).
+**/*.md

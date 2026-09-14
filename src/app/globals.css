@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens: "Deep Field"
+ *
+ * Cold deep-space neutrals and a single warm accent (flare). Martian Mono, a
+ * wide technical monospace, carries labels and short titles; Instrument Sans
+ * carries everything meant to be read.
+ *
+ * `static` keeps every token available as a CSS variable, including ones only
+ * referenced from CSS modules (e.g. the hero placeholder).
+ */
+@theme static {
+  --color-*: initial;
+  --color-void: #05060a; /* page background */
+  --color-deep: #0a0c14; /* raised surfaces */
+  --color-nebula: #11141f; /* hover and input surfaces */
+  --color-line: #1c2130; /* hairlines */
+  --color-line-strong: #2a3144; /* emphasized borders */
+  --color-star: #eceef5; /* primary text */
+  --color-dust: #a2aabd; /* secondary text */
+  --color-faint: #6f7891; /* tertiary text; still meets WCAG AA on void */
+  --color-flare: #ff6a4d; /* the one accent */
+  --color-flare-soft: #ff8c73; /* accent hover */
+
+  --container-site: 76rem;
+  --container-reading: 42rem;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-rise: rise 0.9s var(--ease-out-expo) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* Font variables come from next/font in the root layout. */
+@theme inline {
+  --font-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-martian-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    /* The only background: <Starfield /> sits between it and the content. */
+    background-color: var(--color-void);
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
+  body {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+    font-family: var(--font-sans);
+    color: var(--color-star);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-flare);
+    color: var(--color-void);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flare);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Fixed deep-space backdrop. Two star tiles of different sizes (so their
+     repeats never line up) plus faint nebular light in opposite corners. */
+  .deep-field {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+  }
+
+  .deep-field::before,
+  .deep-field::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .deep-field::before {
+    background: url("/stars-far.svg") 0 0 / 1100px 1100px repeat;
+    opacity: 0.8;
+  }
+
+  .deep-field::after {
+    background:
+      url("/stars-near.svg") 0 0 / 1700px 1700px repeat,
+      radial-gradient(
+        70rem 45rem at 88% -12%,
+        rgb(124 149 255 / 0.09),
+        transparent 62%
+      ),
+      radial-gradient(
+        55rem 38rem at -8% 108%,
+        rgb(255 106 77 / 0.06),
+        transparent 60%
+      );
+  }
+
+  /* Instrument-panel dot grid that fades out toward the edges. */
+  .dot-grid {
+    background-image: radial-gradient(
+      circle at center,
+      var(--color-line-strong) 1px,
+      transparent 1.25px
+    );
+    background-size: 22px 22px;
+    background-position: center;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 72%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

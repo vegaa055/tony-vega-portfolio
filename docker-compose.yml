@@ -1,0 +1,34 @@
+# Local development database. Production uses Neon (connected in Phase 5).
+#
+#   npm run db:up     start it and wait until it's healthy
+#   npm run db:down   stop it (data is kept in the pgdata volume)
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: tony-vega-portfolio-db
+    # If Docker Desktop is shut down abruptly, Postgres flushes its data folder
+    # before starting again. The default does this file by file, which can take
+    # minutes on Docker Desktop's disk; syncfs does it in one call (Linux-only,
+    # fine for a local dev database).
+    command: ["postgres", "-c", "recovery_init_sync_method=syncfs"]
+    environment:
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: portfolio
+      POSTGRES_DB: portfolio
+    ports:
+      # 5434 avoids clashing with a locally installed PostgreSQL on 5432/5433.
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      # Failed checks during a slow start (e.g. crash recovery) don't count.
+      start_period: 5m
+      start_interval: 2s
+
+volumes:
+  pgdata:

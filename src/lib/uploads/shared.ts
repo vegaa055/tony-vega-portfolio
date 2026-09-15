@@ -1,7 +1,7 @@
 /**
  * Where uploaded images go:
  * - "blob": Vercel Blob (production, or anywhere BLOB_READ_WRITE_TOKEN is set)
- * - "local": public/uploads on the dev server (git-ignored)
+ * - "local": the .uploads folder on your own machine (git-ignored)
  * - "disabled": a production build without a Blob store
  */
 export type UploadMode = "blob" | "local" | "disabled";

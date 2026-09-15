@@ -9,7 +9,7 @@ type Size = "md" | "sm";
 export function buttonClass(variant: Variant = "primary", size: Size = "md") {
   return clsx(
     "group inline-flex shrink-0 items-center justify-center gap-3 rounded-xs font-mono tracking-[0.16em] uppercase transition-colors duration-300 disabled:pointer-events-none disabled:opacity-50",
-    size === "md" ? "h-11 px-5 text-[0.68rem]" : "h-9 px-3.5 text-[0.62rem]",
+    size === "md" ? "h-11 px-5 text-label" : "h-9 px-3.5 text-micro",
     {
       primary: "bg-flare text-void hover:bg-flare-soft",
       ghost: "border border-line-strong text-star hover:border-dust",

@@ -13,13 +13,15 @@ async function CopyrightYear() {
   return new Date().getFullYear();
 }
 
-const linkClass = "text-dust transition-colors duration-300 hover:text-star";
+// At least 24px tall, so they're easy to tap.
+const linkClass =
+  "inline-flex min-h-6 items-center gap-1 text-dust transition-colors duration-300 hover:text-star";
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-site flex-col gap-8 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <p className="flex items-center gap-3 font-mono text-[0.66rem] tracking-[0.16em] text-faint uppercase">
+        <p className="flex items-center gap-3 font-mono text-label tracking-[0.16em] text-faint uppercase">
           <span
             aria-hidden="true"
             className="size-1.5 rounded-full bg-flare shadow-[0_0_10px_1px_rgb(255_106_77/0.6)]"
@@ -29,7 +31,7 @@ export function SiteFooter() {
           </span>
         </p>
 
-        <ul className="flex flex-wrap gap-x-6 gap-y-3 font-mono text-[0.66rem] tracking-[0.16em] uppercase">
+        <ul className="flex flex-wrap gap-x-6 gap-y-3 font-mono text-label tracking-[0.16em] uppercase">
           {siteConfig.nav.map((item) => (
             <li key={item.href}>
               <Link href={item.href} className={linkClass}>

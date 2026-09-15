@@ -44,11 +44,12 @@ export function TokenInput({
       <label htmlFor={id} className={labelClass}>
         {label}
       </label>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 rounded-xs border border-line-strong bg-deep p-1.5 transition-colors focus-within:border-flare">
+      {/* The box shows the same focus ring as other fields (see inputClass). */}
+      <div className="mt-2 flex flex-wrap items-center gap-1.5 rounded-xs border border-field bg-deep p-1.5 transition-colors focus-within:border-flare focus-within:outline-2 focus-within:-outline-offset-1">
         {values.map((token) => (
           <span
             key={token}
-            className="inline-flex items-center gap-1 rounded-xs bg-nebula py-1 pr-1 pl-2 font-mono text-[0.62rem] tracking-[0.08em] text-star uppercase"
+            className="inline-flex items-center gap-1 rounded-xs bg-nebula py-1 pr-1 pl-2 font-mono text-micro tracking-[0.08em] text-star uppercase"
           >
             {token}
             <button
@@ -57,7 +58,7 @@ export function TokenInput({
                 onChange(values.filter((value) => value !== token))
               }
               aria-label={`Remove ${token}`}
-              className="inline-flex size-5 items-center justify-center rounded-xs text-dust transition-colors hover:bg-line hover:text-star"
+              className="inline-flex size-6 items-center justify-center rounded-xs text-dust transition-colors hover:bg-line hover:text-star"
             >
               <span aria-hidden="true">×</span>
             </button>

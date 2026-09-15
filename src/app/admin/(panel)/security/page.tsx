@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const instant = false; // See (panel)/layout.tsx.
 
 const sectionHeading =
-  "font-mono text-[0.72rem] tracking-[0.2em] text-dust uppercase";
+  "font-mono text-section tracking-[0.2em] text-dust uppercase";
 
 export default async function SecurityPage() {
   const user = await requireAdmin();

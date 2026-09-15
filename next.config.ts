@@ -3,6 +3,9 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The end-to-end tests build into their own folder, so they never replace
+  // a regular build made from your real content.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // Pages are rendered on the server and cached with `use cache`; admin saves
   // refresh the affected pages through cache tags. See docs/PLAN.md.
   cacheComponents: true,

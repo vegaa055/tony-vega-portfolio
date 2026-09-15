@@ -13,7 +13,7 @@ The full plan, decisions, and phase checklist are in [docs/PLAN.md](docs/PLAN.md
 
 ## Requirements
 
-- Node.js 20.9 or newer
+- Node.js 24
 - Docker Desktop (for the local database)
 
 ## Getting started
@@ -40,6 +40,10 @@ database must be running for `npm run build` too.
 | `npm run lint` | ESLint |
 | `npm run typecheck` | Generate route types, then run TypeScript |
 | `npm run format` | Format with Prettier (sorts Tailwind classes too) |
+| `npm run format:check` | Check formatting without changing files |
+| `npm test` | Unit tests (Vitest) |
+| `npm run test:watch` | Unit tests, rerun as you save |
+| `npm run test:e2e` | End-to-end tests against a production build (see [Tests](#tests)) |
 | `npm run db:up` / `db:down` | Start / stop the local database (data persists) |
 | `npm run db:generate` | Create a migration after editing `src/db/schema.ts` |
 | `npm run db:migrate` | Apply pending migrations |
@@ -57,12 +61,14 @@ Sign in at `/admin`. There's one account, created with `npm run admin:create`;
 sign-ups are turned off.
 
 - **Content** lists every project and post, drafts included. Drafts never
-  appear on the site, and their URLs return 404.
+  appear on the site: their URLs show the not-found page, hidden from search
+  engines.
 - **Editors** for projects, posts, and the About page. Writing is Markdown with
   a live preview. Start sections at `##`: the page title is the only `#`
   heading. Saving a published item updates the public page right away.
 - **Images** can be added with a button, pasted, or dropped. Locally they're
-  saved to `public/uploads` (git-ignored); in production they go to Vercel Blob.
+  saved to `.uploads` (git-ignored) and served from `/uploads`; in production
+  they go to Vercel Blob.
   Cover and gallery images need a description (alt text) before saving. Images
   dropped into the text get a placeholder description to replace.
 - **Security** turns on two-factor login with an authenticator app, makes new
@@ -71,20 +77,49 @@ sign-ups are turned off.
 Login attempts are limited to 5 a minute. If you're locked out, run
 `npm run admin:reset` from the project folder.
 
+## Tests
+
+**Unit tests** (`npm test`) cover the logic that doesn't need a browser:
+validation, slugs, Markdown rendering, uploads, the RSS feed, structured data,
+and editor helpers. They sit next to the code as `*.test.ts`.
+
+**End-to-end tests** (`npm run test:e2e`) click through the real site in
+Chromium: the public pages, every admin flow, login limits, two-factor login,
+SEO files, accessibility checks (axe, plus keyboard walk-throughs), and phone
+layouts at 320px. Before the first run, install the browser:
+
+```bash
+npx playwright install chromium
+```
+
+Each run starts from a clean slate without touching your content. With Docker
+running, it creates a `portfolio_test` database next to your local one, seeds
+it, makes a production build in `.next-e2e`, and serves it on port 3100. Your
+dev server can stay open. The report for the last run opens with
+`npx playwright show-report`.
+
+Once the repository is on GitHub, GitHub Actions runs formatting, lint, types,
+unit tests, and the end-to-end tests on each push to `main` and on pull
+requests (`.github/workflows/ci.yml`).
+
 ## Project layout
 
 ```
 src/
   app/
-    (site)/              public pages: home, projects, blog, about
+    (site)/              public pages: home, projects, blog, about, and their
+                         share images (opengraph-image.tsx beside each page)
     admin/               login, and the signed-in panel in (panel)/
     api/auth/            Better Auth's endpoints
     api/uploads/         image uploads (local folder or Vercel Blob)
+    uploads/[file]/      serves images uploaded locally
+    feed.xml/            the blog's RSS feed
+    sitemap.ts, robots.ts, manifest.ts, apple-icon.tsx
     globals.css          design tokens ("Deep Field"), base and Markdown styles
   components/            page shell and shared UI
     admin/               admin shell, editors, and form fields
     hero/                the hero slot and its CSS-only placeholder
-  config/site.ts         site name, navigation, links
+  config/site.ts         site name, navigation, links, section headers
   data/                  server-only reads (cached for pages; uncached for the admin)
   db/
     schema.ts            content tables: projects, posts, tags, about_page
@@ -94,15 +129,22 @@ src/
     auth/                Better Auth setup, session checks, browser client
     uploads/             upload rules shared by the browser and the server
     markdown/            Markdown pipeline and the code highlighting theme
+    og/card.tsx          draws the share images
+    metadata.ts          page metadata: canonical address, Open Graph, feed link
+    json-ld.ts           structured data for search engines
+    feed.ts              RSS builder
     validation.ts        input rules shared by the editors and Server Actions
     cache-tags.ts        cache tag names shared by reads and admin saves
     env.ts               validated server environment variables
+e2e/                     end-to-end tests (Playwright)
 drizzle/                 generated SQL migrations
 scripts/
   admin/                 create and reset the admin account
   auth/                  config for Better Auth's schema generator
+  e2e/                   sets up the test database before end-to-end tests
   seed/                  seed runner, content entries, and Markdown bodies
   generate-starfield.mjs starfield tile generator
+assets/fonts/            fonts for the share images (SIL Open Font License)
 public/images/           project screenshots and the About portrait
 featured-projects-ref/   source READMEs for the featured project write-ups
 docs/PLAN.md             plan, decisions, and progress
@@ -119,6 +161,10 @@ See [.env.example](.env.example).
 | `NEXT_PUBLIC_SITE_URL` | Absolute URLs in metadata, and the admin login's allowed origin |
 | `BETTER_AUTH_SECRET` | Signs admin sessions. 32+ random characters, different in every environment |
 | `BLOB_READ_WRITE_TOKEN` | Image uploads in production. Set by connecting a Vercel Blob store; leave unset locally |
+
+The end-to-end tests set a few more for their own server: `LOCAL_UPLOADS` and
+`LOCAL_UPLOAD_DIR` (save uploads to disk in a production build), `NEXT_DIST_DIR`
+(a separate build folder), and, in CI, `E2E_DATABASE_URL`. See `e2e/env.ts`.
 
 ## Troubleshooting
 

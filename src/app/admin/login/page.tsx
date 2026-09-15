@@ -27,7 +27,7 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm">
         <Link
           href="/"
-          className="mx-auto flex w-fit items-center gap-2.5 font-mono text-[0.7rem] tracking-[0.18em] text-star uppercase"
+          className="mx-auto flex w-fit items-center gap-2.5 font-mono text-label tracking-[0.18em] text-star uppercase"
         >
           <OrbitMark className="size-6 text-dust" />
           Tony Vega

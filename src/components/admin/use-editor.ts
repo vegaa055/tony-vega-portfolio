@@ -13,6 +13,7 @@ import {
 
 import type { ActionFailure } from "@/app/admin/actions";
 import { runAction } from "@/components/admin/run-action";
+import { mergeSavedChanges } from "@/components/admin/saved-values";
 import {
   carriedSavedMessage,
   carrySavedMessage,
@@ -103,16 +104,8 @@ export function useEditor<T extends object>(initial: T) {
         }
 
         const { changes = {}, message, redirectTo } = onSaved(result, sent);
-        const saved = { ...sent, ...changes };
-        setSavedJson(JSON.stringify(saved));
-        setValues((current) => {
-          const next = { ...current };
-          for (const key of Object.keys(changes) as (keyof T)[]) {
-            // Take the server's value unless the field was edited meanwhile.
-            if (current[key] === sent[key]) next[key] = saved[key];
-          }
-          return next;
-        });
+        setSavedJson(JSON.stringify({ ...sent, ...changes }));
+        setValues((current) => mergeSavedChanges(current, sent, changes));
         setFailure(null);
         setErrors({});
 

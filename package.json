@@ -2,6 +2,9 @@
   "name": "tony-vega-portfolio",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,6 +13,9 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:generate": "drizzle-kit generate",
@@ -41,6 +47,7 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "server-only": "^0.0.1",
+    "sharp": "^0.35.4",
     "shiki": "^4.4.3",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
@@ -48,9 +55,11 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/hast": "^3.0.5",
-    "@types/node": "^20",
+    "@types/node": "^24.13.4",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -58,10 +67,12 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "16.3.5",
     "image-size": "^2.0.4",
+    "otpauth": "^9.5.2",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.1"
   }
 }

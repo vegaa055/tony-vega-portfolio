@@ -18,7 +18,7 @@ export default function AdminError({
 
   return (
     <div className="py-16">
-      <p className="font-mono text-[0.68rem] tracking-[0.2em] text-flare uppercase">
+      <p className="font-mono text-label tracking-[0.2em] text-flare uppercase">
         Error
       </p>
       <h1 className="mt-4 font-mono text-3xl font-extralight text-star font-stretch-semi-expanded">

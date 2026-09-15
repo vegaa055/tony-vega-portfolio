@@ -7,7 +7,10 @@ import { SLUG_PATTERN } from "@/lib/slug";
 
 /** Site files (/images, /uploads) or images in the site's Vercel Blob store. */
 export function isAllowedImageUrl(url: string) {
-  if (url.startsWith("/images/") || url.startsWith("/uploads/")) return true;
+  if (url.startsWith("/images/") || url.startsWith("/uploads/")) {
+    // Plain path characters only, and never a step up out of the folder.
+    return /^[\w./-]+$/.test(url) && !url.split("/").includes("..");
+  }
   try {
     const { protocol, hostname } = new URL(url);
     return (

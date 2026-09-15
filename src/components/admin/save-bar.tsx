@@ -36,7 +36,11 @@ export function SaveBar({
       : (savedMessage ?? "No changes");
 
   return (
-    <div className="sticky bottom-0 z-30 -mx-4 mt-14 border-t border-line bg-void/95 px-4 py-3 backdrop-blur-md sm:-mx-8 sm:px-8">
+    <div
+      // globals.css keeps focused fields from scrolling behind this bar.
+      data-save-bar
+      className="sticky bottom-0 z-30 -mx-4 mt-14 border-t border-line bg-void/95 px-4 py-3 backdrop-blur-md sm:-mx-8 sm:px-8"
+    >
       <div className="flex flex-wrap items-center gap-3">
         <p
           role="status"

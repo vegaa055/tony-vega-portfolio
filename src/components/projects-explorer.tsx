@@ -113,7 +113,7 @@ function FilterButton({ label, count, pressed, onClick }: FilterButtonProps) {
       aria-pressed={pressed}
       onClick={onClick}
       className={clsx(
-        "inline-flex h-9 items-center gap-2 border px-3.5 font-mono text-[0.64rem] tracking-[0.14em] uppercase transition-colors duration-300",
+        "inline-flex h-9 items-center gap-2 border px-3.5 font-mono text-label tracking-[0.14em] uppercase transition-colors duration-300",
         pressed
           ? "border-flare bg-flare/10 text-star"
           : "border-line-strong text-dust hover:border-dust hover:text-star",

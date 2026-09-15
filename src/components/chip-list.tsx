@@ -19,7 +19,7 @@ export function ChipList({ items, label, className }: ChipListProps) {
       {items.map((item) => (
         <li
           key={item}
-          className="border border-line px-2 py-1 font-mono text-[0.58rem] tracking-[0.12em] text-dust uppercase"
+          className="border border-line px-2 py-1 font-mono text-micro tracking-[0.12em] text-dust uppercase"
         >
           {item}
         </li>

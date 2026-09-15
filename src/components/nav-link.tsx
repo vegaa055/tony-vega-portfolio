@@ -21,14 +21,14 @@ export function NavLink({ href, index, children }: NavLinkProps) {
       href={href}
       aria-current={isActive ? "page" : undefined}
       className={clsx(
-        "group relative flex items-center gap-1.5 px-2 font-mono text-[0.66rem] tracking-[0.12em] uppercase transition-colors duration-300 sm:px-3",
+        "group relative flex items-center gap-1.5 px-1.5 font-mono text-label tracking-[0.08em] uppercase transition-colors duration-300 sm:px-3 sm:tracking-[0.12em]",
         isActive ? "text-star" : "text-dust hover:text-star",
       )}
     >
       <span
         aria-hidden="true"
         className={clsx(
-          "hidden text-[0.56rem] transition-colors duration-300 sm:inline",
+          "hidden text-micro transition-colors duration-300 sm:inline",
           isActive ? "text-flare" : "text-faint group-hover:text-flare",
         )}
       >
@@ -39,7 +39,7 @@ export function NavLink({ href, index, children }: NavLinkProps) {
       <span
         aria-hidden="true"
         className={clsx(
-          "absolute inset-x-2 -bottom-px h-px origin-left bg-flare transition-transform duration-500 ease-out-expo sm:inset-x-3",
+          "absolute inset-x-1.5 -bottom-px h-px origin-left bg-flare transition-transform duration-500 ease-out-expo sm:inset-x-3",
           isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
         )}
       />

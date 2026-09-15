@@ -51,8 +51,9 @@ export function SlugField({
     <Field id={id} label="URL" hint={hint} error={error}>
       <div
         className={clsx(
-          "flex items-stretch rounded-xs border bg-deep transition-colors focus-within:border-flare",
-          error ? "border-flare" : "border-line-strong",
+          // The box shows the same focus ring as other fields (see inputClass).
+          "flex items-stretch rounded-xs border bg-deep transition-colors focus-within:border-flare focus-within:outline-2 focus-within:-outline-offset-1",
+          error ? "border-flare" : "border-field",
         )}
       >
         <span
@@ -119,7 +120,7 @@ export function PublishFields({
                 "cursor-pointer rounded-xs border px-3 py-2.5 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-flare",
                 status === option.value
                   ? "border-flare bg-flare/10"
-                  : "border-line-strong hover:border-dust",
+                  : "border-field hover:border-dust",
               )}
             >
               <input

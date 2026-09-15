@@ -80,10 +80,10 @@ export function HeroPlaceholder() {
       {/* Vega (α Lyrae) — the star that shares the name. */}
       {/* Not uppercased: that would turn α into a Latin-looking "A" and break
           the lowercase h/m/s units of right ascension. */}
-      <p className="absolute top-3 right-4 font-mono text-[0.6rem] tracking-[0.08em] text-faint">
+      <p className="absolute top-3 right-4 font-mono text-micro tracking-[0.08em] text-faint">
         α Lyr · 18h 36m 56s · +38° 47′
       </p>
-      <figcaption className="absolute bottom-3 left-4 font-mono text-[0.56rem] tracking-[0.16em] text-faint uppercase">
+      <figcaption className="absolute bottom-3 left-4 font-mono text-micro tracking-[0.16em] text-faint uppercase">
         Fig. 01 — Orrery
       </figcaption>
     </figure>

@@ -29,7 +29,7 @@ export function AdminPageHeader({
 export function StatusBadge({ status }: { status: "draft" | "published" }) {
   const published = status === "published";
   return (
-    <span className="inline-flex items-center gap-2 font-mono text-[0.6rem] tracking-[0.14em] uppercase">
+    <span className="inline-flex items-center gap-2 font-mono text-micro tracking-[0.14em] uppercase">
       <span
         aria-hidden="true"
         className={

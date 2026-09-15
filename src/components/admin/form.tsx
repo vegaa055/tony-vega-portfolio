@@ -2,13 +2,17 @@ import clsx from "clsx";
 
 /** Base style for text inputs, textareas, and selects in the admin. */
 export const inputClass = clsx(
-  "w-full rounded-xs border border-line-strong bg-deep px-3 py-2.5 text-[0.95rem] text-star placeholder:text-faint",
-  "transition-colors duration-200 hover:border-dust/60 focus:border-flare focus:outline-none",
+  "w-full rounded-xs border border-field bg-deep px-3 py-2.5 text-[0.95rem] text-star placeholder:text-faint",
+  "transition-colors duration-200 hover:border-dust/60",
+  // A 2px ring over the border. A color change alone is faint, and can't be
+  // seen at all on a field that's already marked with an error. focus-within
+  // also covers the calendar button inside a date field.
+  "focus-within:border-flare focus-within:outline-2 focus-within:-outline-offset-1",
   "disabled:opacity-60 aria-invalid:border-flare",
 );
 
 export const labelClass =
-  "block font-mono text-[0.62rem] tracking-[0.16em] text-dust uppercase";
+  "block font-mono text-micro tracking-[0.16em] text-dust uppercase";
 
 type FieldProps = {
   /** The id of the control this field labels. */

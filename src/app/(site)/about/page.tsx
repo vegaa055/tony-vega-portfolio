@@ -1,20 +1,23 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 
 import { ChipList } from "@/components/chip-list";
 import { EmptyState } from "@/components/empty-state";
+import { JsonLd } from "@/components/json-ld";
 import { PageHeader } from "@/components/page-header";
 import { Reticle } from "@/components/reticle";
 import { SectionHeading } from "@/components/section-heading";
-import { siteConfig } from "@/config/site";
+import { sections, siteConfig } from "@/config/site";
 import { getAboutPage } from "@/data/about";
 import type { ExperienceEntry } from "@/db/schema";
+import { profilePageJsonLd } from "@/lib/json-ld";
 import { renderMarkdown } from "@/lib/markdown/render";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/about",
   title: "About",
   description: "About Tony Vega: background, skills, and experience.",
-};
+});
 
 export default async function AboutPage() {
   const about = await getAboutPage();
@@ -22,12 +25,7 @@ export default async function AboutPage() {
   if (!about) {
     return (
       <>
-        <PageHeader
-          index="03"
-          eyebrow="Observer"
-          title="About"
-          description="Background, skills, and experience."
-        />
+        <PageHeader {...sections.about} />
         <div className="mx-auto max-w-site px-4 py-16 sm:px-8 sm:py-20">
           <EmptyState title="Coming soon">
             This page is being written.
@@ -45,10 +43,9 @@ export default async function AboutPage() {
 
   return (
     <>
+      <JsonLd data={profilePageJsonLd(about)} />
       <PageHeader
-        index="03"
-        eyebrow="Observer"
-        title="About"
+        {...sections.about}
         description={about.headline || undefined}
       />
 
@@ -70,7 +67,7 @@ export default async function AboutPage() {
             </div>
           ) : null}
 
-          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 font-mono text-[0.66rem] tracking-[0.16em] uppercase">
+          <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 font-mono text-label tracking-[0.16em] uppercase">
             {[
               { href: siteConfig.links.github, label: "GitHub" },
               { href: siteConfig.links.linkedin, label: "LinkedIn" },
@@ -80,7 +77,7 @@ export default async function AboutPage() {
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-dust transition-colors duration-300 hover:text-star"
+                  className="inline-flex min-h-6 items-center gap-1 text-dust transition-colors duration-300 hover:text-star"
                 >
                   {link.label} <span aria-hidden="true">↗</span>
                   <span className="sr-only"> (opens in a new tab)</span>
@@ -102,7 +99,7 @@ export default async function AboutPage() {
           <dl className="reading-backdrop mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {about.skills.map((group) => (
               <div key={group.label}>
-                <dt className="font-mono text-[0.62rem] tracking-[0.18em] text-faint uppercase">
+                <dt className="font-mono text-micro tracking-[0.18em] text-faint uppercase">
                   {group.label}
                 </dt>
                 <dd className="mt-4">
@@ -145,7 +142,7 @@ function Timeline({
 
   return (
     <div>
-      <h3 className="font-mono text-[0.62rem] tracking-[0.18em] text-faint uppercase">
+      <h3 className="font-mono text-micro tracking-[0.18em] text-faint uppercase">
         {title}
       </h3>
       <ol className="mt-6 border-l border-line">
@@ -159,7 +156,7 @@ function Timeline({
               aria-hidden="true"
               className="absolute top-1.5 -left-[3.5px] size-1.5 rounded-full bg-flare shadow-[0_0_8px_1px_rgb(255_106_77/0.5)]"
             />
-            <p className="font-mono text-[0.6rem] tracking-[0.16em] text-faint uppercase">
+            <p className="font-mono text-micro tracking-[0.16em] text-faint uppercase">
               {entry.period}
             </p>
             <h4 className="mt-2 text-lg font-medium tracking-tight text-star">

@@ -258,7 +258,7 @@ export function MarkdownEditor({
               aria-pressed={tab === option}
               onClick={() => setTab(option)}
               className={clsx(
-                "rounded-xs px-3 py-1 font-mono text-[0.6rem] tracking-[0.14em] uppercase",
+                "rounded-xs px-3 py-1 font-mono text-micro tracking-[0.14em] uppercase",
                 tab === option
                   ? "bg-nebula text-star"
                   : "text-dust hover:text-star",
@@ -277,7 +277,7 @@ export function MarkdownEditor({
           <div
             role="group"
             aria-label="Formatting"
-            className="flex flex-wrap items-center gap-0.5 rounded-t-xs border border-b-0 border-line-strong bg-nebula/60 px-1.5 py-1"
+            className="flex flex-wrap items-center gap-0.5 rounded-t-xs border border-b-0 border-field bg-nebula/60 px-1.5 py-1"
           >
             <ToolButton
               label="Bold"
@@ -354,7 +354,7 @@ export function MarkdownEditor({
             tab === "write" && "hidden lg:flex",
           )}
         >
-          <div className="flex h-9 shrink-0 items-center justify-between rounded-t-xs border border-b-0 border-line-strong bg-nebula/60 px-3 font-mono text-[0.58rem] tracking-[0.14em] text-faint uppercase">
+          <div className="flex h-9 shrink-0 items-center justify-between rounded-t-xs border border-b-0 border-line-strong bg-nebula/60 px-3 font-mono text-micro tracking-[0.14em] text-faint uppercase">
             <span>Preview</span>
             {previewProblem ? (
               <span className="text-flare-soft">{previewProblem}</span>
@@ -364,7 +364,11 @@ export function MarkdownEditor({
           </div>
           <div className="min-h-[26rem] flex-1 overflow-auto rounded-b-xs border border-line-strong bg-void px-5 py-6">
             {value.trim() ? (
-              <div className="prose-field">{preview?.content}</div>
+              // The box has its own background, and the site's reading
+              // backdrop would stick out of it and make it scroll sideways.
+              <div className="prose-field before:hidden">
+                {preview?.content}
+              </div>
             ) : (
               <p className="text-sm text-faint">Nothing to preview yet.</p>
             )}

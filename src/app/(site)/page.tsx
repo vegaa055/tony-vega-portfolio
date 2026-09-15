@@ -1,20 +1,26 @@
 import { ButtonLink } from "@/components/button-link";
 import { EmptyState } from "@/components/empty-state";
 import { HeroScene } from "@/components/hero/hero-scene";
+import { JsonLd } from "@/components/json-ld";
 import { PostList } from "@/components/post-list";
 import { ProjectCard } from "@/components/project-card";
 import { SectionHeading } from "@/components/section-heading";
 import { siteConfig } from "@/config/site";
 import { getLatestPosts } from "@/data/posts";
 import { getFeaturedProjects, getPublishedProjects } from "@/data/projects";
+import { websiteJsonLd } from "@/lib/json-ld";
+import { pageMetadata } from "@/lib/metadata";
+
+export const metadata = pageMetadata({ path: "/" });
 
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={websiteJsonLd()} />
       <section className="border-b border-line">
         <div className="mx-auto grid max-w-site items-center gap-12 px-4 pt-14 pb-16 sm:px-8 md:grid-cols-12 md:gap-8 md:pt-20 md:pb-24">
           <div className="md:col-span-7">
-            <p className="flex animate-rise items-center gap-3 font-mono text-[0.68rem] tracking-[0.2em] text-dust uppercase">
+            <p className="flex animate-rise items-center gap-3 font-mono text-label tracking-[0.2em] text-dust uppercase">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-flare shadow-[0_0_12px_2px_rgb(255_106_77/0.6)]"

@@ -14,26 +14,31 @@ export function AdminShell({ user, children }: AdminShellProps) {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-line bg-void/90 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-site items-center gap-4 px-4 sm:gap-8 sm:px-8">
+        {/* One row from sm up. On phones the navigation wraps onto a second,
+            full-width row, so nothing is squeezed off the screen. */}
+        <div className="mx-auto flex max-w-site flex-wrap items-center gap-x-4 px-4 sm:h-14 sm:flex-nowrap sm:gap-8 sm:px-8">
           <Link
             href="/admin"
-            className="flex shrink-0 items-center gap-2.5 font-mono text-[0.66rem] tracking-[0.18em] text-star uppercase"
+            className="flex h-12 shrink-0 items-center gap-2.5 font-mono text-label tracking-[0.18em] text-star uppercase sm:h-auto"
           >
             <OrbitMark className="size-5 text-dust" />
             Admin
           </Link>
 
-          <nav aria-label="Admin" className="h-full">
+          <nav
+            aria-label="Admin"
+            className="order-last -mx-4 h-11 w-[calc(100%+2rem)] border-t border-line px-2 sm:order-none sm:mx-0 sm:h-full sm:w-auto sm:border-t-0 sm:px-0"
+          >
             <ul className="flex h-full items-stretch">
-              <li className="flex">
+              <li className="flex flex-1 sm:flex-none">
                 <AdminNavLink href="/admin" exact>
                   Content
                 </AdminNavLink>
               </li>
-              <li className="flex">
+              <li className="flex flex-1 sm:flex-none">
                 <AdminNavLink href="/admin/about">About page</AdminNavLink>
               </li>
-              <li className="flex">
+              <li className="flex flex-1 sm:flex-none">
                 <AdminNavLink href="/admin/security">Security</AdminNavLink>
               </li>
             </ul>
@@ -44,7 +49,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
               href="/"
               target="_blank"
               rel="noreferrer"
-              className="hidden font-mono text-[0.62rem] tracking-[0.14em] text-dust uppercase transition-colors hover:text-star sm:inline"
+              className="hidden font-mono text-micro tracking-[0.14em] text-dust uppercase transition-colors hover:text-star sm:inline"
             >
               View site <span aria-hidden="true">↗</span>
               <span className="sr-only"> (opens in a new tab)</span>

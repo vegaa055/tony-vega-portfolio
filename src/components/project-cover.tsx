@@ -118,7 +118,7 @@ function GeneratedCover({
           />
         ))}
       </svg>
-      <span className="absolute bottom-4 left-5 font-mono text-[0.58rem] tracking-[0.18em] text-faint uppercase">
+      <span className="absolute bottom-4 left-5 font-mono text-micro tracking-[0.18em] text-faint uppercase">
         {title}
       </span>
     </div>

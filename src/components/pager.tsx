@@ -50,7 +50,7 @@ function PagerCard({
           "border-t border-line sm:border-t-0 sm:border-l sm:text-right",
       )}
     >
-      <span className="font-mono text-[0.62rem] tracking-[0.18em] text-faint uppercase">
+      <span className="font-mono text-micro tracking-[0.18em] text-faint uppercase">
         {isNext ? null : <span aria-hidden="true">← </span>}
         {link.caption}
         {isNext ? <span aria-hidden="true"> →</span> : null}

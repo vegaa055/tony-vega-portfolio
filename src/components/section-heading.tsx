@@ -20,7 +20,7 @@ export function SectionHeading<T extends string>({
     <div className="flex items-baseline justify-between gap-6 border-b border-line pb-4">
       <h2
         id={id}
-        className="font-mono text-[0.72rem] tracking-[0.2em] text-dust uppercase"
+        className="font-mono text-section tracking-[0.2em] text-dust uppercase"
       >
         {/* The catalog number is decoration; the heading's name is the title. */}
         {index ? (
@@ -34,7 +34,7 @@ export function SectionHeading<T extends string>({
       {link ? (
         <Link
           href={link.href}
-          className="group inline-flex shrink-0 items-center gap-2 font-mono text-[0.66rem] tracking-[0.16em] text-faint uppercase transition-colors duration-300 hover:text-star"
+          className="group inline-flex min-h-6 shrink-0 items-center gap-2 font-mono text-label tracking-[0.16em] text-faint uppercase transition-colors duration-300 hover:text-star"
         >
           {link.label}
           <span

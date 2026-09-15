@@ -15,6 +15,8 @@ export type PostSummary = {
   title: string;
   excerpt: string;
   publishedAt: Date;
+  /** When the post was last saved, for the sitemap and search engines. */
+  updatedAt: Date;
   readingMinutes: number;
   tags: TagRef[];
 };
@@ -44,6 +46,7 @@ export async function getPublishedPosts(): Promise<PostSummary[]> {
       excerpt: true,
       body: true,
       publishedAt: true,
+      updatedAt: true,
     },
     with: { postTags: { with: { tag: true } } },
   });
@@ -54,6 +57,7 @@ export async function getPublishedPosts(): Promise<PostSummary[]> {
     excerpt: row.excerpt,
     // Guaranteed by the isNotNull filter above.
     publishedAt: row.publishedAt as Date,
+    updatedAt: row.updatedAt,
     readingMinutes: readingMinutes(row.body),
     tags: toTagRefs(row.postTags),
   }));
@@ -86,6 +90,7 @@ export async function getPublishedPost(
     body: row.body,
     coverImage: row.coverImage,
     publishedAt: row.publishedAt as Date,
+    updatedAt: row.updatedAt,
     readingMinutes: readingMinutes(row.body),
     tags: toTagRefs(row.postTags),
   };

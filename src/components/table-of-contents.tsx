@@ -15,7 +15,7 @@ export function TableOfContents({ headings, className }: TableOfContentsProps) {
     <nav aria-labelledby="contents-heading" className={className}>
       <h2
         id="contents-heading"
-        className="font-mono text-[0.62rem] tracking-[0.18em] text-faint uppercase"
+        className="font-mono text-micro tracking-[0.18em] text-faint uppercase"
       >
         Contents
       </h2>

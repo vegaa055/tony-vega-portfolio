@@ -15,7 +15,7 @@ export function PageHeader({
   return (
     <header className="border-b border-line">
       <div className="mx-auto max-w-site px-4 pt-16 pb-12 sm:px-8 sm:pt-24 sm:pb-16">
-        <p className="animate-rise font-mono text-[0.68rem] tracking-[0.2em] text-faint uppercase">
+        <p className="animate-rise font-mono text-label tracking-[0.2em] text-faint uppercase">
           <span aria-hidden="true">
             <span className="text-flare">{index}</span> /{" "}
           </span>

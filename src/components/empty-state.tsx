@@ -13,7 +13,7 @@ export function EmptyState({ title, children }: EmptyStateProps) {
       <Reticle />
       <div className="relative">
         <OrbitMark className="mx-auto size-10 text-faint" />
-        <p className="mt-6 font-mono text-[0.72rem] tracking-[0.18em] text-dust uppercase">
+        <p className="mt-6 font-mono text-section tracking-[0.18em] text-dust uppercase">
           {title}
         </p>
         {children ? (

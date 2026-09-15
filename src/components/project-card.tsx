@@ -43,7 +43,7 @@ export function ProjectCard({
 
       <p
         aria-hidden="true"
-        className="mt-5 flex items-center justify-between font-mono text-[0.62rem] tracking-[0.18em] text-faint uppercase"
+        className="mt-5 flex items-center justify-between font-mono text-micro tracking-[0.18em] text-faint uppercase"
       >
         <span>
           <span className="text-flare">No.</span> {catalogNumber(position)}

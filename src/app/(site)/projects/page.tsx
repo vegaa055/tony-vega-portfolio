@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { ProjectCard } from "@/components/project-card";
@@ -7,13 +5,16 @@ import {
   ProjectsExplorer,
   type ExplorerTag,
 } from "@/components/projects-explorer";
+import { sections } from "@/config/site";
 import { getPublishedProjects } from "@/data/projects";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
+  path: "/projects",
   title: "Projects",
   description:
     "Simulations, audio software, and web apps by Tony Vega, with notes on how each one works.",
-};
+});
 
 export default async function ProjectsPage() {
   const projects = await getPublishedProjects();
@@ -32,12 +33,7 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      <PageHeader
-        index="01"
-        eyebrow="Catalog"
-        title="Projects"
-        description="Simulations, audio software, and web apps, with notes on how each one works."
-      />
+      <PageHeader {...sections.projects} />
       <div className="mx-auto max-w-site px-4 py-14 sm:px-8 sm:py-20">
         {projects.length === 0 ? (
           <EmptyState title="No projects published yet">

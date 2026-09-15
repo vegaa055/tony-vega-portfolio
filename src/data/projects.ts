@@ -18,6 +18,8 @@ export type ProjectSummary = {
   techStack: string[];
   featured: boolean;
   publishedAt: Date | null;
+  /** When the project was last saved, for the sitemap and search engines. */
+  updatedAt: Date;
   tags: TagRef[];
 };
 
@@ -49,6 +51,7 @@ export async function getPublishedProjects(): Promise<ProjectSummary[]> {
       techStack: true,
       featured: true,
       publishedAt: true,
+      updatedAt: true,
     },
     with: { projectTags: { with: { tag: true } } },
   });
@@ -92,6 +95,7 @@ export async function getPublishedProject(
     liveUrl: row.liveUrl,
     featured: row.featured,
     publishedAt: row.publishedAt,
+    updatedAt: row.updatedAt,
     tags: toTagRefs(row.projectTags),
   };
 }

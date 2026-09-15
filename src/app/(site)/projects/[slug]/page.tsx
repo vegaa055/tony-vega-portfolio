@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/back-link";
 import { ExternalButton } from "@/components/button-link";
 import { ChipList } from "@/components/chip-list";
+import { JsonLd } from "@/components/json-ld";
 import { Pager } from "@/components/pager";
 import { Reticle } from "@/components/reticle";
 import { SectionHeading } from "@/components/section-heading";
@@ -16,13 +17,17 @@ import {
   type ProjectDetail,
 } from "@/data/projects";
 import { catalogNumber, yearOf } from "@/lib/format";
+import { projectJsonLd } from "@/lib/json-ld";
 import { renderMarkdown } from "@/lib/markdown/render";
+import { pageMetadata } from "@/lib/metadata";
 import { slugParams } from "@/lib/static-params";
 
 // This page looks up the project before rendering anything, so a missing or
-// draft project returns a real 404 status. The cost is that navigating here
-// waits for the (prerendered) page instead of showing a loading shell first,
-// so opt out of Next.js's instant-navigation check.
+// draft project shows the not-found page and nothing of the draft. Published
+// projects are prerendered; for any other slug the response has already
+// started streaming, so the status stays 200 and Next.js adds a noindex tag
+// (a "soft 404"). Navigating here waits for the page rather than showing a
+// loading shell, so opt out of Next.js's instant-navigation check.
 export const instant = false;
 
 export async function generateStaticParams() {
@@ -37,28 +42,12 @@ export async function generateMetadata({
   const project = await getPublishedProject(slug);
   if (!project) return { title: "Project not found" };
 
-  const description = project.summary || project.tagline;
-  const cover = project.coverImage;
-
-  return {
+  return pageMetadata({
+    path: `/projects/${project.slug}`,
     title: project.title,
-    description,
-    openGraph: {
-      type: "article",
-      title: project.title,
-      description,
-      images: cover
-        ? [
-            {
-              url: cover.url,
-              alt: cover.alt,
-              width: cover.width,
-              height: cover.height,
-            },
-          ]
-        : undefined,
-    },
-  };
+    description: project.summary || project.tagline,
+    article: { publishedTime: project.publishedAt },
+  });
 }
 
 export default async function ProjectPage({
@@ -84,11 +73,12 @@ export default async function ProjectPage({
 
   return (
     <article>
+      <JsonLd data={projectJsonLd(project)} />
       <header className="border-b border-line">
         <div className="mx-auto max-w-site px-4 pt-10 pb-12 sm:px-8 sm:pt-14 sm:pb-16">
           <BackLink href="/projects">All projects</BackLink>
 
-          <p className="mt-12 animate-rise font-mono text-[0.68rem] tracking-[0.2em] text-faint uppercase">
+          <p className="mt-12 animate-rise font-mono text-label tracking-[0.2em] text-faint uppercase">
             <span aria-hidden="true">
               <span className="text-flare">
                 No. {catalogNumber(position + 1)}
@@ -196,7 +186,7 @@ export default async function ProjectPage({
                     />
                   </div>
                   {image.caption ? (
-                    <figcaption className="mt-3 font-mono text-[0.62rem] tracking-[0.14em] text-faint uppercase">
+                    <figcaption className="mt-3 font-mono text-micro tracking-[0.14em] text-faint uppercase">
                       {image.caption}
                     </figcaption>
                   ) : null}
@@ -239,8 +229,7 @@ function ProjectSpecs({
   project: ProjectDetail;
   year: string | null;
 }) {
-  const label =
-    "font-mono text-[0.62rem] tracking-[0.18em] text-faint uppercase";
+  const label = "font-mono text-micro tracking-[0.18em] text-faint uppercase";
 
   return (
     <dl className="grid gap-8 border-y border-line py-8 sm:grid-cols-2 lg:grid-cols-1">
@@ -269,7 +258,7 @@ function ProjectSpecs({
                 <li key={tag.slug}>
                   <Link
                     href={`/projects?tag=${tag.slug}`}
-                    className="text-sm text-dust underline decoration-flare/50 underline-offset-4 transition-colors duration-300 hover:text-star hover:decoration-flare"
+                    className="inline-flex min-h-6 items-center text-sm text-dust underline decoration-flare/50 underline-offset-4 transition-colors duration-300 hover:text-star hover:decoration-flare"
                   >
                     {tag.name}
                   </Link>

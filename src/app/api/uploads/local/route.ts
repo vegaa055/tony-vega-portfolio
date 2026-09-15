@@ -3,38 +3,19 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { auth } from "@/lib/auth";
-import { getUploadMode } from "@/lib/uploads/server";
+import { getUploadMode, localUploadDir } from "@/lib/uploads/server";
 import {
   IMAGE_TYPES,
   isImageType,
   MAX_IMAGE_BYTES,
-  type ImageType,
 } from "@/lib/uploads/shared";
-
-/** Checks the file's first bytes, so a renamed non-image is rejected. */
-function hasImageSignature(bytes: Uint8Array, type: ImageType) {
-  const ascii = (from: number, to: number) =>
-    String.fromCharCode(...bytes.subarray(from, to));
-
-  switch (type) {
-    case "image/jpeg":
-      return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-    case "image/png":
-      return bytes[0] === 0x89 && ascii(1, 4) === "PNG";
-    case "image/gif":
-      return ascii(0, 4) === "GIF8";
-    case "image/webp":
-      return ascii(0, 4) === "RIFF" && ascii(8, 12) === "WEBP";
-    case "image/avif":
-      return ascii(4, 8) === "ftyp" && ["avif", "avis"].includes(ascii(8, 12));
-  }
-}
+import { hasImageSignature } from "@/lib/uploads/signature";
 
 const error = (message: string, status: number) =>
   Response.json({ error: message }, { status });
 
 /**
- * Development-only image uploads, saved to public/uploads (git-ignored).
+ * Image uploads saved to disk when running locally (see getUploadMode).
  * Production uploads go straight from the browser to Vercel Blob instead.
  */
 export async function POST(request: Request) {
@@ -64,9 +45,10 @@ export async function POST(request: Request) {
 
   // A random name: nothing from the client ends up in the path.
   const name = `${randomUUID()}.${IMAGE_TYPES[file.type]}`;
-  const folder = path.join(process.cwd(), "public", "uploads");
+  const folder = localUploadDir();
   await mkdir(folder, { recursive: true });
-  await writeFile(path.join(folder, name), bytes);
+  // See localUploadDir about the comment.
+  await writeFile(path.join(/* turbopackIgnore: true */ folder, name), bytes);
 
   return Response.json({ url: `/uploads/${name}` });
 }

@@ -70,6 +70,44 @@ function rehypeFigures() {
   };
 }
 
+/** A node's child elements with the given tag name. */
+function childElements(node: Element, tagName: string) {
+  return node.children.filter(
+    (child): child is Element =>
+      child.type === "element" && child.tagName === tagName,
+  );
+}
+
+/**
+ * A table with an empty top-left cell, like a comparison table, has labels
+ * down its first column. Those cells become row headers, so screen readers
+ * read each value with its row's label as well as its column's.
+ */
+function rehypeRowHeaders() {
+  return (tree: Root) => {
+    visit(tree, "element", (table) => {
+      if (table.tagName !== "table") return;
+
+      const [head] = childElements(table, "thead");
+      const [headRow] = head ? childElements(head, "tr") : [];
+      const [corner] = headRow ? childElements(headRow, "th") : [];
+      if (!corner || textOf(corner).trim()) return;
+
+      // A header with no text labels nothing.
+      corner.tagName = "td";
+      for (const body of childElements(table, "tbody")) {
+        for (const row of childElements(body, "tr")) {
+          const [label] = childElements(row, "td");
+          if (label) {
+            label.tagName = "th";
+            label.properties.scope = "row";
+          }
+        }
+      }
+    });
+  };
+}
+
 function isHeadingAnchor(node: ElementContent) {
   return (
     node.type === "element" &&
@@ -111,6 +149,7 @@ async function buildProcessor() {
       // below add their own trusted markup.
       .use(rehypeSanitize)
       .use(rehypeFigures)
+      .use(rehypeRowHeaders)
       .use(rehypeSlug)
       .use(rehypeAutolinkHeadings, {
         behavior: "append",

@@ -330,7 +330,7 @@ function BackupCodes({ codes }: { codes: string[] }) {
     >
       <h3
         id="backup-codes-heading"
-        className="font-mono text-[0.66rem] tracking-[0.16em] text-star uppercase"
+        className="font-mono text-label tracking-[0.16em] text-star uppercase"
       >
         Backup codes
       </h3>

@@ -19,7 +19,8 @@
   --color-line-strong: #2a3144; /* emphasized borders */
   --color-star: #eceef5; /* primary text */
   --color-dust: #a2aabd; /* secondary text */
-  --color-faint: #6f7891; /* tertiary text; still meets WCAG AA on void */
+  --color-faint: #778098; /* tertiary text; 4.5:1 (WCAG AA) on every surface */
+  --color-field: #585f72; /* form field borders; 3:1 against the page */
   --color-flare: #ff6a4d; /* the one accent */
   --color-flare-soft: #ff8c73; /* accent hover */
 
@@ -50,12 +51,50 @@
     var(--font-martian-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
+/*
+ * Small mono label sizes. On phones none is smaller than 12px, the smallest
+ * size that stays comfortable to read on a small screen. From the sm
+ * breakpoint up they keep the compact sizes the design uses.
+ */
+
+/* Dates, chips, badges, card details, form labels, small buttons. */
+@utility text-micro {
+  font-size: 0.75rem;
+  @media (width >= 40rem) {
+    font-size: 0.625rem;
+  }
+}
+
+/* Navigation, links, eyebrows, regular buttons. */
+@utility text-label {
+  font-size: 0.75rem;
+  @media (width >= 40rem) {
+    font-size: 0.6875rem;
+  }
+}
+
+/* Section headings set in mono capitals. */
+@utility text-section {
+  font-size: 0.8125rem;
+  @media (width >= 40rem) {
+    font-size: 0.75rem;
+  }
+}
+
 @layer base {
   html {
     color-scheme: dark;
     /* The only background: <Starfield /> sits between it and the content. */
     background-color: var(--color-void);
     scrollbar-color: var(--color-line-strong) transparent;
+    /* When the page scrolls to a heading link or to whatever has keyboard
+       focus, it stops clear of the sticky header. */
+    scroll-padding-top: 6rem;
+  }
+
+  /* Admin editors also have a sticky save bar along the bottom. */
+  html:has([data-save-bar]) {
+    scroll-padding-bottom: 7rem;
   }
 
   body {
@@ -71,6 +110,15 @@
   ::selection {
     background-color: var(--color-flare);
     color: var(--color-void);
+  }
+
+  /* Focus rings are always the accent color. It's set on every element, not
+     only focused ones, so elements with color transitions don't fade the ring
+     in from white. */
+  *,
+  ::before,
+  ::after {
+    outline-color: var(--color-flare);
   }
 
   :focus-visible {
@@ -138,6 +186,9 @@
     isolation: isolate;
   }
 
+  /* The sides reach no further than the page's side padding (px-4, then
+     sm:px-8) until the screen is wide enough to have margins, so the backdrop
+     never makes the page scroll sideways. */
   .prose-field::before,
   .reading-backdrop::before {
     content: "";
@@ -165,6 +216,13 @@
   }
 
   @media (min-width: 40rem) {
+    .prose-field::before,
+    .reading-backdrop::before {
+      inset: -2.5rem -2rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
     .prose-field::before,
     .reading-backdrop::before {
       inset: -2.5rem -3rem;
@@ -205,10 +263,6 @@
     margin-top: 1.75em;
     font-weight: 600;
     color: var(--color-star);
-  }
-
-  .prose-field :where(h2, h3, h4) {
-    scroll-margin-top: 6rem;
   }
 
   .prose-field :where(h2, h3, h4) + * {
@@ -339,10 +393,15 @@
     position: absolute;
     top: 0.8rem;
     left: 1.25rem;
-    font-size: 0.6rem;
+    /* Same sizes as text-micro: 12px on phones. */
+    font-size: 0.75rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--color-faint);
+
+    @media (width >= 40rem) {
+      font-size: 0.625rem;
+    }
   }
 
   .prose-field :where(figure) {
@@ -358,10 +417,15 @@
   .prose-field :where(figcaption) {
     margin-top: 0.75em;
     font-family: var(--font-mono);
-    font-size: 0.64rem;
+    /* Same sizes as text-label: 12px on phones. */
+    font-size: 0.75rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-faint);
+
+    @media (width >= 40rem) {
+      font-size: 0.6875rem;
+    }
   }
 
   .table-scroll {
@@ -380,17 +444,42 @@
     padding: 0 1em 0.7em 0;
     text-align: left;
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    /* Same sizes as text-micro: 12px on phones. */
+    font-size: 0.75rem;
     font-weight: 400;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-faint);
+
+    @media (width >= 40rem) {
+      font-size: 0.625rem;
+    }
   }
 
   .prose-field :where(td) {
     border-bottom: 1px solid var(--color-line);
     padding: 0.65em 1em 0.65em 0;
     vertical-align: top;
+  }
+
+  /* Row headers (see rehypeRowHeaders in src/lib/markdown) look like regular
+     cells, a little brighter. */
+  .prose-field :where(tbody th) {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.65em 1em 0.65em 0;
+    vertical-align: top;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 500;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--color-star);
+  }
+
+  /* The empty cell above them lines up with the column headers. */
+  .prose-field :where(thead td) {
+    border-bottom: 1px solid var(--color-line-strong);
+    padding: 0 1em 0.7em 0;
   }
 
   .prose-field :where(th[align="right"], td[align="right"]) {

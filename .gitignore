@@ -12,6 +12,12 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/blob-report/
+# the end-to-end tests' build, uploads, and saved login
+/.next-e2e/
+/.e2e/
 
 # next.js
 /.next/
@@ -37,8 +43,8 @@ yarn-error.log*
 # vercel
 .vercel
 
-# images uploaded through the admin during local development
-/public/uploads/
+# images uploaded through the admin when running locally
+/.uploads/
 
 # typescript
 *.tsbuildinfo

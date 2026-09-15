@@ -18,7 +18,7 @@ export function PostList({
       {posts.map((post) => (
         <li key={post.slug} className="border-b border-line">
           <article className="group relative grid gap-3 py-8 outline-offset-4 outline-flare has-[a:focus-visible]:outline-2 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-8">
-            <p className="font-mono text-[0.62rem] tracking-[0.16em] text-faint uppercase sm:pt-2.5">
+            <p className="font-mono text-micro tracking-[0.16em] text-faint uppercase sm:pt-2.5">
               <time dateTime={isoDate(post.publishedAt)}>
                 {formatDate(post.publishedAt)}
               </time>
@@ -38,7 +38,7 @@ export function PostList({
                   {post.excerpt}
                 </p>
               ) : null}
-              <p className="mt-4 font-mono text-[0.6rem] tracking-[0.16em] text-faint uppercase">
+              <p className="mt-4 font-mono text-micro tracking-[0.16em] text-faint uppercase">
                 {post.readingMinutes} min read
                 {post.tags.length > 0
                   ? ` · ${post.tags.map((tag) => tag.name).join(", ")}`

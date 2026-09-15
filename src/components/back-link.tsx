@@ -13,7 +13,7 @@ export function BackLink<T extends string>({
   return (
     <Link
       href={href}
-      className="group inline-flex items-center gap-2 font-mono text-[0.64rem] tracking-[0.16em] text-faint uppercase transition-colors duration-300 hover:text-star"
+      className="group inline-flex min-h-6 items-center gap-2 font-mono text-label tracking-[0.16em] text-faint uppercase transition-colors duration-300 hover:text-star"
     >
       <span
         aria-hidden="true"

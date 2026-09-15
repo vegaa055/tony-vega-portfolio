@@ -12,7 +12,7 @@ export default function NotFound() {
   return (
     <SiteChrome>
       <section className="mx-auto max-w-site px-4 py-24 sm:px-8 sm:py-32">
-        <p className="animate-rise font-mono text-[0.68rem] tracking-[0.2em] text-flare uppercase">
+        <p className="animate-rise font-mono text-label tracking-[0.2em] text-flare uppercase">
           Error 404
         </p>
         <h1 className="mt-5 animate-rise font-mono text-[clamp(2.5rem,8vw,5rem)] leading-none font-extralight tracking-[-0.03em] font-stretch-semi-expanded [animation-delay:80ms]">

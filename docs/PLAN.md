@@ -55,7 +55,7 @@ Defined in `src/db/schema.ts`.
 - [x] Blog index and post pages
 - [x] About page from the database: bio, portrait, skills, experience timeline
 - [x] Seed script (`npm run db:seed`): 4 featured projects, 10 older projects as drafts, About content, 1 published post and 1 draft
-- [x] Real 404s for drafts and unknown slugs; production build works with an empty database and a seeded one
+- [x] Drafts and unknown slugs show the not-found page (a noindex "soft 404" in production; see notes); production build works with an empty database and a seeded one
 
 ### Phase 3: Admin panel ✅
 
@@ -69,10 +69,21 @@ Defined in `src/db/schema.ts`.
 
 ### Phase 4: Polish and quality
 
-- [ ] Design pass and mobile layouts
-- [ ] SEO: metadata, generated share images, sitemap, robots, RSS
-- [ ] Accessibility and Lighthouse checks
-- [ ] Tests: Vitest (units) and Playwright (admin flows)
+- [x] Tests: Vitest unit tests (`npm test`), Playwright end-to-end tests against a production build with its own database (`npm run test:e2e`), and a GitHub Actions workflow that runs both
+- [x] Design pass and mobile layouts: text at least 12px on phones, tap targets at least 24px, lighter faint text and stronger field borders for contrast, the admin usable at 320px, no sideways scrolling at tablet and laptop widths, a public error page, Apple icon and web manifest
+- [x] SEO: canonical addresses, Open Graph and X (Twitter) tags, a generated share image for every public page, sitemap, robots.txt, an RSS feed at `/feed.xml`, and structured data (JSON-LD)
+- [x] Accessibility: axe checks (WCAG 2.2 A and AA rules) on public and admin pages at desktop and phone widths, and keyboard walk-throughs. Fixed along the way: a 2px focus ring on admin fields, and focused elements no longer scroll behind the sticky header or save bar
+- [x] Lighthouse (mobile) scores recorded below. Fixed from its findings: comparison tables written with an empty top-left cell now mark their first column as row headers
+
+**Lighthouse scores** (Lighthouse 13.4.1, mobile: an emulated phone on simulated slow 4G, against the production build on the development machine, 2026-09-15, median of three runs):
+
+| Page | Performance | Accessibility | Best practices | SEO |
+| --- | --- | --- | --- | --- |
+| Home | 94 | 100 | 100 | 100 |
+| Project (3D Solar System) | 94 | 100 | 100 | 100 |
+| Post (Rebuilding my portfolio) | 100 | 100 | 100 | 100 |
+
+Performance swung between runs (81 to 99 on the home page) because the machine was busy, so measure again on Vercel in Phase 5. The weakest number is the project page's Largest Contentful Paint (its title) at 2.3 to 3.0s in Lighthouse's slow-4G simulation. The server answers from its cache in under 100ms, so check it again after deploying before changing anything for it.
 
 ### Phase 5: Deploy to Vercel
 
@@ -101,11 +112,15 @@ Things discovered along the way that will matter later.
   `src/lib/slug.ts`, which can never produce that placeholder.
 - **Dates:** project cards show the year of `publishedAt`. When publishing an
   older draft (e.g. Space Force), set its publish date in the editor first.
-- **Detail pages block on purpose:** `/projects/[slug]` and `/blog/[slug]` look
-  up content before rendering, so drafts and unknown slugs return real 404s.
-  They export `instant = false` to acknowledge Next.js's instant-navigation
-  warning. If navigation ever feels slow in production, add `prefetch` to the
-  card links rather than wrapping the pages in `<Suspense>`.
+- **Detail pages and 404s:** `/projects/[slug]` and `/blog/[slug]` look up
+  content before rendering, so drafts and unknown slugs show the not-found page
+  and nothing of the draft. In production, only published slugs are
+  prerendered; any other slug has already started streaming, so the status is
+  200 with a `noindex` tag (a "soft 404"), which the end-to-end tests check.
+  Other unknown addresses get a real 404. A true 404 there would need a
+  database lookup in `proxy.ts` before every request, which isn't worth it for
+  drafts nobody links to. The pages export `instant = false`; if navigation
+  ever feels slow, add `prefetch` to the card links.
 - **Class name collisions:** Shiki adds its theme name as a class on every code
   block (`deep-field-code`). An earlier theme name matched the starfield's class
   and broke code blocks, so keep site classes and Markdown output distinct.
@@ -135,14 +150,47 @@ Things discovered along the way that will matter later.
 - **Instant navigation warnings:** the admin layouts and pages export
   `instant = false`. `(panel)/loading.tsx` still shows while an admin page
   loads, but the dev-time check doesn't count it.
-- **Phase 4, tests:** hidden pages stay in the DOM, so Playwright tests must use
-  visibility-aware locators (`getByRole`, `getByLabel`).
-- **Phase 4, public errors:** the admin has its own `error.tsx`; the public site
-  still uses Next.js's default error page.
+- **End-to-end tests:** `npm run test:e2e` recreates a `portfolio_test`
+  database on the local Postgres (it refuses any database whose name doesn't
+  end in `_test`), builds into `.next-e2e`, and serves on port 3100, so it never
+  touches your content or your dev build. Because Next.js keeps recently
+  visited pages in the document (hidden), tests find form fields with the
+  visibility-aware `field()` helper in `e2e/helpers.ts`. Tests that sign in
+  send their own IP address, since login is rate limited per address.
 - **Uploads outlive content:** deleting a post or project leaves its images in
   storage (the delete dialog says so). A cleanup tool could come later.
-- **Phase 4, icons:** only `src/app/icon.svg` exists. Add PNG/ICO fallbacks and an
-  `apple-icon`.
+- **Metadata merging:** when a page sets `openGraph` or `alternates`, Next.js
+  replaces the layout's values instead of merging them. Public pages build
+  their metadata with `pageMetadata()` in `src/lib/metadata.ts`, so each one
+  gets the full set: canonical address, feed link, and site name.
+- **Share images:** each public page has an `opengraph-image.tsx` beside it.
+  The home page's lives in `(site)/`, because a page that sets `openGraph`
+  loses a share image inherited from a parent folder. Files inside route groups
+  get a hash in their address (`/opengraph-image-12o0cb`). Cards are drawn by
+  `src/lib/og/card.tsx` inside `use cache`, so they're built with the pages and
+  refreshed by the same cache tags when content is saved. The renderer only
+  lays out with flexbox, needs WOFF or TTF fonts (in `assets/fonts`, under the
+  SIL Open Font License), can't draw WebP or AVIF (sharp converts covers), and
+  only clamps lines on `display: block` elements.
+- **Build tracing:** a file path built from a variable, like the local upload
+  folder, makes Turbopack ship the whole project with the server code. Those
+  paths carry a `/* turbopackIgnore: true */` comment. Watch the build output
+  for "Dynamic filesystem access" warnings.
+- **Sitemap and feed:** built with the site and refreshed through the `posts`
+  and `projects` cache tags. The end-to-end tests check that a newly published
+  post appears in both. `robots.ts` blocks all crawling on Vercel preview
+  deployments.
+- **Focus and sticky bars:** `scroll-padding` on `html` (in `globals.css`)
+  keeps focused elements from scrolling behind the sticky header, and behind
+  the editors' save bar (marked `data-save-bar`). Anything else made sticky
+  needs the same treatment.
+- **Login rate limit and IP addresses:** Better Auth only trusts
+  `x-forwarded-for` when it holds a single address. Vercel sets that header
+  itself, so the limit works there. A self-hosted `next start` with nothing in
+  front would let clients pick their own address and dodge the limit, so run
+  production on Vercel, or behind a proxy that overwrites the header.
+- **Node.js 24:** required by `package.json` (`engines`). CI and Vercel read
+  the version from there.
 - **Phase 5, Neon:** the Vercel integration sets `DATABASE_URL` (pooled, for the
   app) and `DATABASE_URL_UNPOOLED` (direct, for migrations). Cache Components
   requires the Node.js runtime, so no route may use the Edge runtime.

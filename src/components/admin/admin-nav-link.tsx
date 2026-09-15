@@ -23,7 +23,7 @@ export function AdminNavLink({ href, exact, children }: AdminNavLinkProps) {
       href={href}
       aria-current={isActive ? "page" : undefined}
       className={clsx(
-        "relative flex items-center px-2 font-mono text-[0.62rem] tracking-[0.12em] uppercase transition-colors duration-300 sm:px-3",
+        "relative flex w-full items-center justify-center px-2 font-mono text-label tracking-[0.12em] uppercase transition-colors duration-300 sm:w-auto sm:justify-start sm:px-3",
         isActive ? "text-star" : "text-dust hover:text-star",
       )}
     >

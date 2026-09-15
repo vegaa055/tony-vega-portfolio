@@ -3,7 +3,7 @@ import { ButtonLink } from "@/components/button-link";
 export default function AdminNotFound() {
   return (
     <div className="py-16">
-      <p className="font-mono text-[0.68rem] tracking-[0.2em] text-flare uppercase">
+      <p className="font-mono text-label tracking-[0.2em] text-flare uppercase">
         Not found
       </p>
       <h1 className="mt-4 font-mono text-3xl font-extralight text-star font-stretch-semi-expanded">

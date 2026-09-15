@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "Sign in",
 };
 
+// Waits for the session check, so a signed-in admin goes straight to the
+// dashboard instead of seeing the form first.
+export const instant = false;
+
 export default async function LoginPage() {
   if (await getSession()) redirect("/admin");
 

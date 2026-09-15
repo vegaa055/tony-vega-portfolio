@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: "Security",
 };
 
+export const instant = false; // See (panel)/layout.tsx.
+
 const sectionHeading =
   "font-mono text-[0.72rem] tracking-[0.2em] text-dust uppercase";
 

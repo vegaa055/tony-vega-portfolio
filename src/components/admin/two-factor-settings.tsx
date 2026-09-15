@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { renderSVG } from "uqr";
 
 import {
@@ -51,6 +51,17 @@ export function TwoFactorSettings({ enabled }: { enabled: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  // Next.js keeps this page mounted (hidden) after you leave it. Don't leave
+  // the setup secret or backup codes in the page: start over instead.
+  useLayoutEffect(
+    () => () => {
+      setStage({ step: "idle" });
+      setError(null);
+      setNotice(null);
+    },
+    [],
+  );
 
   function begin(purpose: Purpose) {
     setError(null);

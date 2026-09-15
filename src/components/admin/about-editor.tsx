@@ -63,6 +63,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
     failure,
     saving,
     savedMessage,
+    fieldId,
     save,
   } = useEditor(toDraft(about));
 
@@ -99,7 +100,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
       <div className="mt-10 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-7">
           <TextField
-            id="headline"
+            id={fieldId("headline")}
             label="Headline"
             hint="Shown under the page title."
             value={values.headline}
@@ -110,7 +111,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
         </div>
         <aside>
           <ImageField
-            id="portrait"
+            id={fieldId("portrait")}
             label="Portrait"
             hint="A square photo works best."
             value={values.portrait}
@@ -123,7 +124,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
 
       <div className="mt-12">
         <MarkdownEditor
-          id="bio"
+          id={fieldId("bio")}
           label="Bio"
           value={values.bio}
           onChange={(bio) => set("bio", bio)}
@@ -141,7 +142,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
 
         <ol className="mt-5 grid gap-4 lg:grid-cols-2">
           {values.skills.map((group, index) => {
-            const labelId = `skills-${index}-label`;
+            const labelId = fieldId(`skills-${index}-label`);
             const groupError = errors[`skills.${index}.label`];
             return (
               <li
@@ -169,7 +170,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
                   />
                 </Field>
                 <TokenInput
-                  id={`skills-${index}-items`}
+                  id={fieldId(`skills-${index}-items`)}
                   label="Skills"
                   values={group.items}
                   onChange={(items) => updateSkill(index, { items })}
@@ -218,7 +219,7 @@ export function AboutEditor({ about, uploadMode }: AboutEditorProps) {
         <ol className="mt-5 space-y-4">
           {values.experience.map((entry, index) => {
             const prefix = `experience.${index}`;
-            const idPrefix = `experience-${index}`;
+            const idPrefix = fieldId(`experience-${index}`);
             return (
               <li
                 key={entry.key}

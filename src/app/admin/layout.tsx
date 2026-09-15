@@ -10,9 +10,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Every admin page depends on who's signed in, so it renders on each request
-// and waits for the session check. Opting out here skips the static-shell and
-// instant-navigation checks for the whole admin area.
+// Admin pages depend on who's signed in, so they render on each request. This
+// skips the static-shell check for the admin area and lets navigations into it
+// wait for the session check. Navigations inside the admin are covered by
+// (panel)/layout.tsx, (panel)/loading.tsx, and login/page.tsx.
 export const instant = false;
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {

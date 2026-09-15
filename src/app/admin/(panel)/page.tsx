@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   title: "Content",
 };
 
+export const instant = false; // See (panel)/layout.tsx.
+
 const th =
   "border-b border-line-strong px-3 pb-3 text-left font-mono text-[0.6rem] font-normal tracking-[0.14em] text-faint uppercase first:pl-0";
 const td = "border-b border-line px-3 py-3.5 align-middle first:pl-0";
@@ -131,7 +133,15 @@ export default async function DashboardPage() {
                             {project.title} (opens in a new tab)
                           </span>
                         </a>
-                      ) : null}
+                      ) : (
+                        // Keeps the arrows lined up with rows that have a link.
+                        <span
+                          aria-hidden="true"
+                          className={buttonClass("quiet", "sm") + " invisible"}
+                        >
+                          View
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>

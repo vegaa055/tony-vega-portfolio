@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import { useState } from "react";
 
 import { deleteProjectAction, saveProjectAction } from "@/app/admin/actions";
@@ -67,10 +68,9 @@ export function ProjectEditor({
     failure,
     saving,
     savedMessage,
+    fieldId,
     save,
   } = useEditor(project ? toInput(project) : EMPTY);
-  // null until a new project is saved for the first time.
-  const [projectId, setProjectId] = useState(project?.id ?? null);
   // New projects take their URL from the title until it's edited by hand.
   const [slugEdited, setSlugEdited] = useState(project !== null);
   const [liveSlug, setLiveSlug] = useState(
@@ -80,31 +80,37 @@ export function ProjectEditor({
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     save(
-      (sent) => saveProjectAction(projectId, sent),
+      (sent) => saveProjectAction(project?.id ?? null, sent),
       (result, sent) => {
         setLiveSlug(sent.status === "published" ? result.slug : null);
-        if (!projectId) {
-          setProjectId(result.id);
-          // Point the address at the new project without reloading the editor.
-          window.history.replaceState(null, "", `/admin/projects/${result.id}`);
-        }
         return {
           changes: { publishedAt: result.publishedAt },
           message:
             sent.status === "published"
               ? "Saved. The live page is updated."
               : "Saved as a draft.",
+          // A new project continues on its own edit page.
+          redirectTo: project
+            ? undefined
+            : (`/admin/projects/${result.id}` as Route),
         };
       },
     );
   }
 
   return (
-    <form ref={formRef} onSubmit={submit} noValidate>
+    <form
+      ref={formRef}
+      onSubmit={submit}
+      noValidate
+      // While a new project saves and its edit page opens, anything typed
+      // would be lost, so the form is locked until then.
+      inert={saving && !project}
+    >
       <AdminPageHeader
-        title={projectId ? "Edit project" : "New project"}
+        title={project ? "Edit project" : "New project"}
         description={
-          projectId
+          project
             ? values.title || "Untitled project"
             : "Fill in the details, then save it as a draft or publish it."
         }
@@ -113,7 +119,7 @@ export function ProjectEditor({
       <div className="mt-10 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-7">
           <TextField
-            id="title"
+            id={fieldId("title")}
             label="Title"
             value={values.title}
             onChange={(title) =>
@@ -126,7 +132,7 @@ export function ProjectEditor({
             error={errors.title}
           />
           <SlugField
-            id="slug"
+            id={fieldId("slug")}
             prefix="/projects/"
             value={values.slug}
             onChange={(slug) => {
@@ -135,9 +141,10 @@ export function ProjectEditor({
             }}
             error={errors.slug}
             live={liveSlug !== null}
+            autoFill={!slugEdited}
           />
           <TextField
-            id="tagline"
+            id={fieldId("tagline")}
             label="Tagline"
             hint="One line, shown under the title on cards."
             value={values.tagline}
@@ -145,7 +152,7 @@ export function ProjectEditor({
             error={errors.tagline}
           />
           <TextField
-            id="summary"
+            id={fieldId("summary")}
             label="Summary"
             hint="A short paragraph for search results and link previews."
             value={values.summary}
@@ -157,6 +164,7 @@ export function ProjectEditor({
 
         <aside className="space-y-8">
           <PublishFields
+            dateId={fieldId("publishedAt")}
             status={values.status}
             publishedAt={values.publishedAt}
             onStatusChange={(status) => set("status", status)}
@@ -181,7 +189,7 @@ export function ProjectEditor({
             </label>
           </div>
           <ImageField
-            id="coverImage"
+            id={fieldId("coverImage")}
             label="Cover image"
             hint="Shown on cards and at the top of the page. 1200 × 630 fits cards without cropping."
             value={values.coverImage}
@@ -194,7 +202,7 @@ export function ProjectEditor({
 
       <div className="mt-12">
         <MarkdownEditor
-          id="body"
+          id={fieldId("body")}
           label="Write-up"
           hint="Start sections with ## headings. Paste or drop images straight into the text."
           value={values.body}
@@ -206,7 +214,7 @@ export function ProjectEditor({
 
       <div className="mt-12 grid gap-x-12 gap-y-8 lg:grid-cols-2">
         <TokenInput
-          id="tags"
+          id={fieldId("tags")}
           label="Tags"
           hint="Used to filter the projects page. Press Enter after each one."
           values={values.tags}
@@ -216,7 +224,7 @@ export function ProjectEditor({
           error={firstError(errors, "tags")}
         />
         <TokenInput
-          id="techStack"
+          id={fieldId("techStack")}
           label="Built with"
           hint="Languages and tools, in the order you want them shown."
           values={values.techStack}
@@ -225,7 +233,7 @@ export function ProjectEditor({
           error={firstError(errors, "techStack")}
         />
         <TextField
-          id="liveUrl"
+          id={fieldId("liveUrl")}
           label="Live site"
           type="url"
           placeholder="https://"
@@ -234,7 +242,7 @@ export function ProjectEditor({
           error={errors.liveUrl}
         />
         <TextField
-          id="repoUrl"
+          id={fieldId("repoUrl")}
           label="Source code"
           type="url"
           placeholder="https://github.com/…"
@@ -246,7 +254,7 @@ export function ProjectEditor({
 
       <div className="mt-12">
         <GalleryField
-          id="gallery"
+          id={fieldId("gallery")}
           label="Gallery"
           hint="Extra screenshots, shown at the end of the project page."
           value={values.gallery}
@@ -263,14 +271,14 @@ export function ProjectEditor({
         failure={failure}
         viewHref={liveSlug ? `/projects/${liveSlug}` : null}
       >
-        {projectId ? (
+        {project ? (
           <ConfirmDialog
             triggerLabel="Delete"
             title="Delete this project?"
             description={`"${values.title || "Untitled project"}" will be removed from the site permanently. Its uploaded images stay in storage.`}
             confirmLabel="Delete project"
             pendingLabel="Deleting…"
-            onConfirm={() => deleteProjectAction(projectId)}
+            onConfirm={() => deleteProjectAction(project.id)}
           />
         ) : null}
       </SaveBar>

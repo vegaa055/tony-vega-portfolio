@@ -1,13 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { buttonClass } from "@/components/button-link";
 import { authClient } from "@/lib/auth/client";
 
 export function SignOutButton() {
-  const router = useRouter();
   const [state, setState] = useState<"idle" | "pending" | "failed">("idle");
 
   async function signOut() {
@@ -16,8 +14,10 @@ export function SignOutButton() {
     // Stay put if it didn't work, rather than showing a login page while
     // still signed in.
     if (error) return setState("failed");
-    router.replace("/admin/login");
-    router.refresh();
+    // A full page load on purpose, not a client navigation: it clears the
+    // admin pages Next.js keeps in memory, so Back can't bring one up.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign("/admin/login");
   }
 
   return (

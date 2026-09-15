@@ -31,6 +31,13 @@ export class SlugTakenError extends Error {
   }
 }
 
+/** Thrown when saving a post or project that has been deleted. */
+export class ContentMissingError extends Error {
+  constructor() {
+    super("This item no longer exists.");
+  }
+}
+
 function isUniqueViolation(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false;
   if ("code" in error && error.code === "23505") return true;
@@ -218,6 +225,7 @@ export async function getProjectForEditor(
  * slug, plus the previous slug when it changed, so both pages get refreshed.
  */
 export async function saveProject(id: string | null, values: ProjectValues) {
+  if (id !== null && !isUuid(id)) throw new ContentMissingError();
   const { tags: tagNames, ...fields } = values;
   const publishedAt =
     fields.status === "published"
@@ -234,7 +242,7 @@ export async function saveProject(id: string | null, values: ProjectValues) {
           .select({ slug: projects.slug })
           .from(projects)
           .where(eq(projects.id, id));
-        if (!existing) throw new Error("This project no longer exists.");
+        if (!existing) throw new ContentMissingError();
         previousSlug = existing.slug;
 
         await tx
@@ -331,6 +339,7 @@ export async function getPostForEditor(
 
 /** Creates (id null) or updates a post with its tags. */
 export async function savePost(id: string | null, values: PostValues) {
+  if (id !== null && !isUuid(id)) throw new ContentMissingError();
   const { tags: tagNames, ...fields } = values;
   const publishedAt =
     fields.status === "published"
@@ -347,7 +356,7 @@ export async function savePost(id: string | null, values: PostValues) {
           .select({ slug: posts.slug })
           .from(posts)
           .where(eq(posts.id, id));
-        if (!existing) throw new Error("This post no longer exists.");
+        if (!existing) throw new ContentMissingError();
         previousSlug = existing.slug;
 
         await tx

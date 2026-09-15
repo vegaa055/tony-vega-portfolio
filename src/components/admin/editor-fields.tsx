@@ -28,6 +28,8 @@ type SlugFieldProps = {
   error?: string;
   /** Whether the page is live, so changing the URL would break links. */
   live: boolean;
+  /** Whether the URL still follows the title as it's typed. */
+  autoFill: boolean;
 };
 
 export function SlugField({
@@ -37,10 +39,13 @@ export function SlugField({
   onChange,
   error,
   live,
+  autoFill,
 }: SlugFieldProps) {
   const hint = live
     ? "This page is live. Changing its URL breaks links to the old address."
-    : "Filled in from the title. Lowercase letters, numbers, and hyphens.";
+    : autoFill
+      ? "Filled in from the title. Lowercase letters, numbers, and hyphens."
+      : "Lowercase letters, numbers, and hyphens.";
 
   return (
     <Field id={id} label="URL" hint={hint} error={error}>
@@ -72,6 +77,8 @@ export function SlugField({
 }
 
 type PublishFieldsProps = {
+  /** The id of the date input. */
+  dateId: string;
   status: "draft" | "published";
   publishedAt: string;
   onStatusChange: (status: "draft" | "published") => void;
@@ -81,6 +88,7 @@ type PublishFieldsProps = {
 
 /** Draft or published, and the date shown on the site. */
 export function PublishFields({
+  dateId,
   status,
   publishedAt,
   onStatusChange,
@@ -130,22 +138,18 @@ export function PublishFields({
       </fieldset>
 
       <Field
-        id="publishedAt"
+        id={dateId}
         label="Publish date"
         hint={dateHint}
         error={errors.publishedAt}
       >
         <input
-          id="publishedAt"
+          id={dateId}
           type="date"
           value={publishedAt}
           onChange={(event) => onDateChange(event.target.value)}
           aria-invalid={Boolean(errors.publishedAt)}
-          aria-describedby={describedBy(
-            "publishedAt",
-            dateHint,
-            errors.publishedAt,
-          )}
+          aria-describedby={describedBy(dateId, dateHint, errors.publishedAt)}
           className={clsx(inputClass, "[color-scheme:dark]")}
         />
       </Field>

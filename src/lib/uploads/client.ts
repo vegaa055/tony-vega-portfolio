@@ -78,6 +78,8 @@ export function altFromFileName(name: string) {
   return (
     name
       .replace(/\.[^.]+$/, "")
+      // Brackets and backslashes would break the ![description](url) syntax.
+      .replace(/[[\]\\]/g, "")
       .replace(/[-_]+/g, " ")
       .trim() || "Image"
   );

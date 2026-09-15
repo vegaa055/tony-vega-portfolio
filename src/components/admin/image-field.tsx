@@ -98,9 +98,11 @@ export function ImageField({
                 ref={altRef}
                 id={altId}
                 value={value.alt}
-                onChange={(event) =>
-                  onChange({ ...value, alt: event.target.value })
-                }
+                onChange={(event) => {
+                  // "Now describe the image" has done its job.
+                  setNotice(null);
+                  onChange({ ...value, alt: event.target.value });
+                }}
                 aria-invalid={Boolean(errors.alt)}
                 aria-describedby={describedBy(altId, altHint, errors.alt)}
                 className={inputClass}

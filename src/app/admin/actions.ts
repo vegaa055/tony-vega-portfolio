@@ -4,6 +4,7 @@ import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  ContentMissingError,
   deletePost,
   deleteProject,
   moveProject,
@@ -69,6 +70,11 @@ const invalid = (fieldErrors: FieldErrors): ActionFailure => ({
   fieldErrors,
 });
 
+const missing = (kind: "post" | "project"): ActionFailure => ({
+  ok: false,
+  message: `Not saved. This ${kind} has been deleted.`,
+});
+
 /** Renders Markdown exactly as the public site will, for the live preview. */
 export async function previewMarkdownAction(
   source: string,
@@ -106,6 +112,7 @@ export async function saveProjectAction(
     if (error instanceof SlugTakenError) {
       return invalid({ slug: "Another project already uses this URL." });
     }
+    if (error instanceof ContentMissingError) return missing("project");
     throw error;
   }
 }
@@ -156,6 +163,7 @@ export async function savePostAction(
     if (error instanceof SlugTakenError) {
       return invalid({ slug: "Another post already uses this URL." });
     }
+    if (error instanceof ContentMissingError) return missing("post");
     throw error;
   }
 }

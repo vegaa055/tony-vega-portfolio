@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { PostEditor } from "@/components/admin/post-editor";
+import { ResetOnNavigation } from "@/components/admin/reset-on-navigation";
 import { getPostForEditor, getTagNames } from "@/data/admin";
 import { requireAdmin } from "@/lib/auth/session";
 import { getUploadMode } from "@/lib/uploads/server";
@@ -9,6 +10,8 @@ import { getUploadMode } from "@/lib/uploads/server";
 export const metadata: Metadata = {
   title: "Edit post",
 };
+
+export const instant = false; // See (panel)/layout.tsx.
 
 export default async function EditPostPage({
   params,
@@ -23,11 +26,13 @@ export default async function EditPostPage({
   if (!post) notFound();
 
   return (
-    <PostEditor
-      key={post.id}
-      post={post}
-      tagSuggestions={tagSuggestions}
-      uploadMode={getUploadMode()}
-    />
+    <ResetOnNavigation>
+      <PostEditor
+        key={post.id}
+        post={post}
+        tagSuggestions={tagSuggestions}
+        uploadMode={getUploadMode()}
+      />
+    </ResetOnNavigation>
   );
 }

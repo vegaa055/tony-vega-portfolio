@@ -1,9 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import type { Route } from "next";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 
 import type { ActionFailure } from "@/app/admin/actions";
 import { runAction } from "@/components/admin/run-action";
+import {
+  carriedSavedMessage,
+  carrySavedMessage,
+  clearCarriedSavedMessage,
+} from "@/components/admin/saved-message";
 import type { FieldErrors } from "@/lib/validation";
 
 type SavedUpdate<T> = {
@@ -11,26 +25,38 @@ type SavedUpdate<T> = {
   changes?: Partial<T>;
   /** Shown in the save bar until the next change. */
   message: string;
+  /** A page to open next, like a new item's edit page after its first save. */
+  redirectTo?: Route;
 };
 
 const failed = (result: { ok: boolean }): result is ActionFailure => !result.ok;
 
 /**
  * Form state for an admin editor: the current values, whether they differ
- * from what was last saved, saving through a Server Action, and a warning
- * before leaving with unsaved changes.
+ * from what was last saved, saving through a Server Action, unique field ids,
+ * and a warning before leaving with unsaved changes.
  */
 export function useEditor<T extends object>(initial: T) {
+  const router = useRouter();
+  const pathname = usePathname();
   const formRef = useRef<HTMLFormElement>(null);
+  const idPrefix = useId();
   const [values, setValues] = useState(initial);
   const [savedJson, setSavedJson] = useState(() => JSON.stringify(initial));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [failure, setFailure] = useState<ActionFailure | null>(null);
-  const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  // Starts with the confirmation from the save that opened this page, if any.
+  const [savedMessage, setSavedMessage] = useState(() =>
+    carriedSavedMessage(pathname),
+  );
   const [saving, startSaving] = useTransition();
   const dirty = JSON.stringify(values) !== savedJson;
 
   useUnsavedChangesWarning(dirty);
+
+  useEffect(() => {
+    clearCarriedSavedMessage(pathname);
+  }, [pathname]);
 
   // After a rejected save, move to the first field with an error.
   useEffect(() => {
@@ -48,6 +74,12 @@ export function useEditor<T extends object>(initial: T) {
   }, []);
 
   /**
+   * A unique element id for a field. Next.js keeps recently visited pages
+   * mounted, so two editors can be in the document at once.
+   */
+  const fieldId = (name: string) => `${idPrefix}${name}`;
+
+  /**
    * Sends the current values to `action`. On success, `onSaved` returns what
    * to update. Anything typed while the save was running is kept, and still
    * counts as unsaved.
@@ -59,27 +91,39 @@ export function useEditor<T extends object>(initial: T) {
     const sent = values;
     startSaving(async () => {
       const result = await runAction(() => action(sent));
-      if (failed(result)) {
-        setFailure(result);
-        // Keep earlier field errors when the server never got to check.
-        if (result.fieldErrors) setErrors(result.fieldErrors);
-        return;
-      }
 
-      const { changes = {}, message } = onSaved(result, sent);
-      const saved = { ...sent, ...changes };
-      setSavedJson(JSON.stringify(saved));
-      setValues((current) => {
-        const next = { ...current };
-        for (const key of Object.keys(changes) as (keyof T)[]) {
-          // Take the server's value unless the field was edited meanwhile.
-          if (current[key] === sent[key]) next[key] = saved[key];
+      // Updates after an await need their own startTransition to stay part of
+      // the save, so `saving` is true until they (or a redirect) finish.
+      startSaving(() => {
+        if (failed(result)) {
+          setFailure(result);
+          // Keep earlier field errors when the server never got to check.
+          if (result.fieldErrors) setErrors(result.fieldErrors);
+          return;
         }
-        return next;
+
+        const { changes = {}, message, redirectTo } = onSaved(result, sent);
+        const saved = { ...sent, ...changes };
+        setSavedJson(JSON.stringify(saved));
+        setValues((current) => {
+          const next = { ...current };
+          for (const key of Object.keys(changes) as (keyof T)[]) {
+            // Take the server's value unless the field was edited meanwhile.
+            if (current[key] === sent[key]) next[key] = saved[key];
+          }
+          return next;
+        });
+        setFailure(null);
+        setErrors({});
+
+        if (redirectTo) {
+          // The next page shows the confirmation once it opens.
+          carrySavedMessage(redirectTo, message);
+          router.replace(redirectTo);
+        } else {
+          setSavedMessage(message);
+        }
       });
-      setFailure(null);
-      setErrors({});
-      setSavedMessage(message);
     });
   }
 
@@ -93,6 +137,7 @@ export function useEditor<T extends object>(initial: T) {
     failure,
     saving,
     savedMessage,
+    fieldId,
     save,
   };
 }

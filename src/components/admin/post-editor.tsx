@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import { useState } from "react";
 
 import { deletePostAction, savePostAction } from "@/app/admin/actions";
@@ -59,10 +60,9 @@ export function PostEditor({
     failure,
     saving,
     savedMessage,
+    fieldId,
     save,
   } = useEditor(post ? toInput(post) : EMPTY);
-  // null until a new post is saved for the first time.
-  const [postId, setPostId] = useState(post?.id ?? null);
   const [slugEdited, setSlugEdited] = useState(post !== null);
   const [liveSlug, setLiveSlug] = useState(
     post?.status === "published" ? post.slug : null,
@@ -71,31 +71,35 @@ export function PostEditor({
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     save(
-      (sent) => savePostAction(postId, sent),
+      (sent) => savePostAction(post?.id ?? null, sent),
       (result, sent) => {
         setLiveSlug(sent.status === "published" ? result.slug : null);
-        if (!postId) {
-          setPostId(result.id);
-          // Point the address at the new post without reloading the editor.
-          window.history.replaceState(null, "", `/admin/posts/${result.id}`);
-        }
         return {
           changes: { publishedAt: result.publishedAt },
           message:
             sent.status === "published"
               ? "Saved. The live post is updated."
               : "Saved as a draft.",
+          // A new post continues on its own edit page.
+          redirectTo: post ? undefined : (`/admin/posts/${result.id}` as Route),
         };
       },
     );
   }
 
   return (
-    <form ref={formRef} onSubmit={submit} noValidate>
+    <form
+      ref={formRef}
+      onSubmit={submit}
+      noValidate
+      // While a new post saves and its edit page opens, anything typed would
+      // be lost, so the form is locked until then.
+      inert={saving && !post}
+    >
       <AdminPageHeader
-        title={postId ? "Edit post" : "New post"}
+        title={post ? "Edit post" : "New post"}
         description={
-          postId
+          post
             ? values.title || "Untitled post"
             : "Write it here, then save it as a draft or publish it."
         }
@@ -104,7 +108,7 @@ export function PostEditor({
       <div className="mt-10 grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-7">
           <TextField
-            id="title"
+            id={fieldId("title")}
             label="Title"
             value={values.title}
             onChange={(title) =>
@@ -117,7 +121,7 @@ export function PostEditor({
             error={errors.title}
           />
           <SlugField
-            id="slug"
+            id={fieldId("slug")}
             prefix="/blog/"
             value={values.slug}
             onChange={(slug) => {
@@ -126,9 +130,10 @@ export function PostEditor({
             }}
             error={errors.slug}
             live={liveSlug !== null}
+            autoFill={!slugEdited}
           />
           <TextField
-            id="excerpt"
+            id={fieldId("excerpt")}
             label="Excerpt"
             hint="A sentence or two for the blog list and link previews."
             value={values.excerpt}
@@ -137,7 +142,7 @@ export function PostEditor({
             multiline={3}
           />
           <TokenInput
-            id="tags"
+            id={fieldId("tags")}
             label="Tags"
             hint="Press Enter after each one."
             values={values.tags}
@@ -149,6 +154,7 @@ export function PostEditor({
 
         <aside className="space-y-8">
           <PublishFields
+            dateId={fieldId("publishedAt")}
             status={values.status}
             publishedAt={values.publishedAt}
             onStatusChange={(status) => set("status", status)}
@@ -156,7 +162,7 @@ export function PostEditor({
             errors={errors}
           />
           <ImageField
-            id="coverImage"
+            id={fieldId("coverImage")}
             label="Cover image (optional)"
             hint="Shown at the top of the post and in link previews."
             value={values.coverImage}
@@ -169,7 +175,7 @@ export function PostEditor({
 
       <div className="mt-12">
         <MarkdownEditor
-          id="body"
+          id={fieldId("body")}
           label="Post"
           hint="Start sections with ## headings. Paste or drop images straight into the text."
           value={values.body}
@@ -186,14 +192,14 @@ export function PostEditor({
         failure={failure}
         viewHref={liveSlug ? `/blog/${liveSlug}` : null}
       >
-        {postId ? (
+        {post ? (
           <ConfirmDialog
             triggerLabel="Delete"
             title="Delete this post?"
             description={`"${values.title || "Untitled post"}" will be removed from the site permanently. Its uploaded images stay in storage.`}
             confirmLabel="Delete post"
             pendingLabel="Deleting…"
-            onConfirm={() => deletePostAction(postId)}
+            onConfirm={() => deletePostAction(post.id)}
           />
         ) : null}
       </SaveBar>

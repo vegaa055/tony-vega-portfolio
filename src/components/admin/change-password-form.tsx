@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { Field, FormMessage, inputClass } from "@/components/admin/form";
 import { buttonClass } from "@/components/button-link";
@@ -15,6 +15,16 @@ export function ChangePasswordForm() {
     text: string;
   } | null>(null);
   const [pending, setPending] = useState(false);
+
+  // Next.js keeps this page mounted (hidden) after you leave it, so clear any
+  // typed passwords and the last message then.
+  useLayoutEffect(() => {
+    const form = formRef.current;
+    return () => {
+      form?.reset();
+      setMessage(null);
+    };
+  }, []);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

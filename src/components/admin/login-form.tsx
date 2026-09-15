@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import {
   describedBy,
@@ -25,6 +25,12 @@ const LOGIN_ERRORS = {
 };
 
 /**
+ * A ref that clears a form's fields when it's hidden or removed. After signing
+ * in, Next.js keeps this page mounted (hidden), typed password included.
+ */
+const clearOnHide = (form: HTMLFormElement | null) => () => form?.reset();
+
+/**
  * Password first, then (when two-factor is on) a code from an authenticator
  * app or a backup code. Calls go through /api/auth so they're rate limited.
  */
@@ -33,6 +39,15 @@ export function LoginForm() {
   const [step, setStep] = useState<Step>("password");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  // Start over at the password step if the page is shown again.
+  useLayoutEffect(
+    () => () => {
+      setStep("password");
+      setError(null);
+    },
+    [],
+  );
 
   function signedIn() {
     router.replace("/admin");
@@ -79,7 +94,7 @@ export function LoginForm() {
 
   if (step === "password") {
     return (
-      <form onSubmit={submitPassword} className="space-y-5">
+      <form ref={clearOnHide} onSubmit={submitPassword} className="space-y-5">
         {error ? <FormMessage tone="error">{error}</FormMessage> : null}
         <Field id="email" label="Email">
           <input
@@ -118,7 +133,7 @@ export function LoginForm() {
     : "The 6-digit code from your authenticator app.";
 
   return (
-    <form onSubmit={submitCode} className="space-y-5">
+    <form ref={clearOnHide} onSubmit={submitCode} className="space-y-5">
       {error ? <FormMessage tone="error">{error}</FormMessage> : null}
       <Field
         id="code"

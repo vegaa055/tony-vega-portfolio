@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ProjectEditor } from "@/components/admin/project-editor";
+import { ResetOnNavigation } from "@/components/admin/reset-on-navigation";
 import { getProjectForEditor, getTagNames } from "@/data/admin";
 import { requireAdmin } from "@/lib/auth/session";
 import { getUploadMode } from "@/lib/uploads/server";
@@ -9,6 +10,8 @@ import { getUploadMode } from "@/lib/uploads/server";
 export const metadata: Metadata = {
   title: "Edit project",
 };
+
+export const instant = false; // See (panel)/layout.tsx.
 
 export default async function EditProjectPage({
   params,
@@ -23,11 +26,13 @@ export default async function EditProjectPage({
   if (!project) notFound();
 
   return (
-    <ProjectEditor
-      key={project.id}
-      project={project}
-      tagSuggestions={tagSuggestions}
-      uploadMode={getUploadMode()}
-    />
+    <ResetOnNavigation>
+      <ProjectEditor
+        key={project.id}
+        project={project}
+        tagSuggestions={tagSuggestions}
+        uploadMode={getUploadMode()}
+      />
+    </ResetOnNavigation>
   );
 }

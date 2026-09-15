@@ -155,6 +155,38 @@ export function MarkdownEditor({
     );
   }
 
+  /**
+   * Inserts images at the cursor, each on its own lines so they never join a
+   * sentence or a code fence, and selects the first description to type over.
+   */
+  function insertImages(snippets: string[]) {
+    const current = selection();
+    if (!current) return;
+    const before = current.all.slice(0, current.start);
+    const after = current.all.slice(current.end);
+    const lead =
+      before === "" || before.endsWith("\n\n")
+        ? ""
+        : before.endsWith("\n")
+          ? "\n"
+          : "\n\n";
+    const trail =
+      after === "" || after.startsWith("\n\n")
+        ? ""
+        : after.startsWith("\n")
+          ? "\n"
+          : "\n\n";
+    // The first description sits between "![" and "](".
+    const altStart = lead.length + 2;
+    const altEnd = lead.length + snippets[0].indexOf("](");
+    replaceRange(
+      current.start,
+      current.end,
+      lead + snippets.join("\n\n") + trail,
+      [altStart, altEnd],
+    );
+  }
+
   async function uploadAndInsert(files: File[]) {
     const images = files.filter((file) => file.type.startsWith("image/"));
     if (images.length === 0) return;
@@ -165,28 +197,29 @@ export function MarkdownEditor({
         ? "Uploading image…"
         : `Uploading ${images.length} images…`,
     );
+    const snippets: string[] = [];
+    let problem: string | null = null;
     try {
-      const snippets: string[] = [];
       for (const file of images) {
         const { url } = await uploadImage(file, uploadMode);
         snippets.push(`![${altFromFileName(file.name)}](${url})`);
       }
-      // Insert wherever the cursor is now, not where it was when uploading began.
-      const current = selection();
-      if (current)
-        replaceRange(current.start, current.end, snippets.join("\n\n"));
-      setNotice(
-        "Uploaded. Replace the text in [square brackets] with a description of each image.",
-      );
     } catch (uploadError) {
-      setNotice(
+      problem =
         uploadError instanceof Error
           ? uploadError.message
-          : "The upload failed.",
-      );
+          : "The upload failed.";
     } finally {
       setUploading(false);
     }
+
+    // Insert wherever the cursor is now, not where it was when uploading
+    // began, and keep whatever finished uploading even if a later file failed.
+    if (snippets.length > 0) insertImages(snippets);
+    setNotice(
+      problem ??
+        "Uploaded. Replace the text in [square brackets] with a description of each image.",
+    );
   }
 
   function onKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {

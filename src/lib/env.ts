@@ -4,6 +4,10 @@ import { z } from "zod";
 
 const serverEnvSchema = z.object({
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  BETTER_AUTH_SECRET: z
+    .string()
+    .min(32, "must be at least 32 characters (see .env.example)"),
+  BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
 });
 
 function parseServerEnv() {

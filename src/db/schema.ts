@@ -16,6 +16,9 @@ import {
 // Column keys are camelCase in TypeScript and snake_case in Postgres
 // (`casing: "snake_case"` in drizzle.config.ts and src/db/index.ts).
 
+// Admin login tables, managed by Better Auth.
+export * from "./auth-schema";
+
 /* -------------------------------------------------------------------------- */
 /* Shared                                                                     */
 /* -------------------------------------------------------------------------- */

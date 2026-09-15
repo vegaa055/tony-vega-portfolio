@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Type-check every <Link href> against the routes that actually exist.
   typedRoutes: true,
+  images: {
+    // Images uploaded through the admin in production live in Vercel Blob.
+    remotePatterns: [
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+    ],
+  },
   turbopack: {
     // Pin the project root. Without this, a package-lock.json in a parent
     // folder can make Next.js guess the wrong root.

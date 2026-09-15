@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, Martian_Mono } from "next/font/google";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { Starfield } from "@/components/starfield";
 import { siteConfig } from "@/config/site";
 
 import "./globals.css";
@@ -39,6 +36,7 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
+// The public site's frame lives in (site)/layout.tsx; the admin has its own.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -52,12 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Starfield />
-        <SiteHeader />
-        <main id="main" tabIndex={-1} className="flex-1 outline-none">
-          {children}
-        </main>
-        <SiteFooter />
+        {children}
       </body>
     </html>
   );

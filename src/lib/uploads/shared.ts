@@ -1,6 +1,7 @@
 /**
  * Where uploaded images go:
- * - "blob": Vercel Blob (production, or anywhere BLOB_READ_WRITE_TOKEN is set)
+ * - "blob": Vercel Blob (wherever a Blob store is connected: BLOB_STORE_ID or
+ *   BLOB_READ_WRITE_TOKEN is set)
  * - "local": the .uploads folder on your own machine (git-ignored)
  * - "disabled": a production build without a Blob store
  */

@@ -231,11 +231,15 @@ Things discovered along the way that will matter later.
 - **Changing production data outside the admin** (seeding, SQL): redeploy
   without the build cache. Prerendered pages refresh only through admin saves
   (cache tags) or a new build.
-- **Blob:** create the store with public access. Connecting it sets
-  `BLOB_READ_WRITE_TOKEN`; without it, production uploads are turned off and
-  the editor says so. Browsers upload straight to Blob, which the
-  Content-Security-Policy allows (`vercel.com` and
-  `*.blob.vercel-storage.com`).
+- **Blob:** create the store with public access. Connecting it now uses OIDC:
+  it sets `BLOB_STORE_ID` and `BLOB_WEBHOOK_PUBLIC_KEY`, not the old
+  `BLOB_READ_WRITE_TOKEN`, so the upload route uses the presigned flow
+  (`handleUploadPresigned` with `issueSignedToken`) and the browser uses
+  `uploadPresigned`. Without either variable, production uploads are off and
+  the editor says so. Browsers upload straight to `vercel.com/api/blob`, and
+  images are served from `*.public.blob.vercel-storage.com`; the
+  Content-Security-Policy allows both (a unit test checks the upload host).
+  The store's read-write token isn't used, so it can be revoked.
 - **Content-Security-Policy:** it lives in `next.config.ts`. Adding a
   third-party script, font, image host, or API means adding it there too, or
   browsers block it (the console says which directive).

@@ -111,10 +111,10 @@ images.
 **First time:**
 
 1. Import the GitHub repo into Vercel. Next.js is detected automatically.
-2. In the project's **Storage** tab, add **Neon Postgres** and a **Blob**
-   store. When connecting Neon, leave **Custom Prefix** empty: the app reads
-   `DATABASE_URL` and `DATABASE_URL_UNPOOLED` by those exact names. Don't add
-   them by hand.
+2. In the project's **Storage** tab, add **Neon Postgres** and a public
+   **Blob** store. Leave **Custom Prefix** empty on both: the app reads
+   `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `BLOB_STORE_ID` by those exact
+   names. Don't add them by hand.
 3. Add `BETTER_AUTH_SECRET` as a **Secret** (a fresh value, see
    [.env.example](.env.example)) for Production and Preview, and
    `NEXT_PUBLIC_SITE_URL` as **Config** (the site's address) for
@@ -206,7 +206,7 @@ See [.env.example](.env.example).
 | `DATABASE_URL_UNPOOLED` | Migrations and seeding (direct connection on Neon) |
 | `NEXT_PUBLIC_SITE_URL` | Absolute URLs in metadata, and the admin login's allowed origin |
 | `BETTER_AUTH_SECRET` | Signs admin sessions. 32+ random characters, different in every environment |
-| `BLOB_READ_WRITE_TOKEN` | Image uploads in production. Set by connecting a Vercel Blob store; leave unset locally |
+| `BLOB_STORE_ID`, `BLOB_WEBHOOK_PUBLIC_KEY` | Image uploads in production. Set by connecting a Vercel Blob store (uploads sign in with Vercel's rotating OIDC credentials); leave unset locally |
 
 The end-to-end tests set a few more for their own server: `LOCAL_UPLOADS` and
 `LOCAL_UPLOAD_DIR` (save uploads to disk in a production build), `NEXT_DIST_DIR`

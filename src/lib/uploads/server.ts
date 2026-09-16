@@ -5,7 +5,11 @@ import path from "node:path";
 import type { UploadMode } from "./shared";
 
 export function getUploadMode(): UploadMode {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return "blob";
+  // A connected Blob store: its id (Vercel's OIDC connection, the default) or
+  // an older read-write token.
+  if (process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN) {
+    return "blob";
+  }
   // Saving to disk works on your own machine: the dev server, or a production
   // build started with LOCAL_UPLOADS=true (the end-to-end tests do this).
   // It never works on Vercel, which is why production uses Blob.

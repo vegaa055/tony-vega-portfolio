@@ -42,13 +42,26 @@ export async function uploadImage(
 
   if (mode === "blob") {
     // Loaded on demand, so local development never downloads it.
-    const { upload } = await import("@vercel/blob/client");
-    const blob = await upload(`uploads/${safeName(file.name)}`, file, {
-      access: "public",
-      handleUploadUrl: "/api/uploads/blob",
-      contentType: file.type,
-    });
-    return { url: blob.url, ...size };
+    const { uploadPresigned } = await import("@vercel/blob/client");
+    try {
+      const blob = await uploadPresigned(
+        `uploads/${safeName(file.name)}`,
+        file,
+        {
+          access: "public",
+          handleUploadUrl: "/api/uploads/blob",
+          contentType: file.type,
+        },
+      );
+      return { url: blob.url, ...size };
+    } catch (error) {
+      // The SDK's messages are written for developers; keep them in the
+      // console and show something plainer.
+      console.error("Image upload failed:", error);
+      throw new Error(
+        "The upload failed. If you've been signed out, sign in again, then try once more.",
+      );
+    }
   }
 
   if (mode === "local") {

@@ -1,13 +1,23 @@
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { issueSignedToken } from "@vercel/blob";
+import {
+  handleUploadPresigned,
+  type HandleUploadPresignedBody,
+} from "@vercel/blob/client";
 
 import { auth } from "@/lib/auth";
 import { getUploadMode } from "@/lib/uploads/server";
 import { IMAGE_TYPES, MAX_IMAGE_BYTES } from "@/lib/uploads/shared";
 
+/** How long an upload link stays valid. */
+const UPLOAD_WINDOW_MS = 10 * 60 * 1000;
+
+class SignedOutError extends Error {}
+
 /**
- * Issues short-lived tokens so the browser can upload images straight to
- * Vercel Blob (no size limit from passing through a function), but only for a
- * signed-in admin, and only for images.
+ * Hands the browser a short-lived presigned link to upload one image straight
+ * to Vercel Blob (so the file never passes through a function), but only for
+ * a signed-in admin, and only for images. It authenticates to Blob with
+ * Vercel's rotating OIDC credentials, so no long-lived Blob secret is needed.
  */
 export async function POST(request: Request) {
   if (getUploadMode() !== "blob") {
@@ -15,28 +25,40 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as HandleUploadBody;
-    const result = await handleUpload({
+    const body = (await request.json()) as HandleUploadPresignedBody;
+    const result = await handleUploadPresigned({
       body,
       request,
-      onBeforeGenerateToken: async () => {
+      getSignedToken: async (pathname) => {
         const session = await auth.api.getSession({ headers: request.headers });
-        if (!session) throw new Error("Sign in to upload images.");
+        if (!session) throw new SignedOutError("Sign in to upload images.");
 
-        return {
+        const limits = {
           allowedContentTypes: Object.keys(IMAGE_TYPES),
           maximumSizeInBytes: MAX_IMAGE_BYTES,
-          addRandomSuffix: true,
+          validUntil: Date.now() + UPLOAD_WINDOW_MS,
+        };
+        return {
+          // Only this pathname, only uploads, only images.
+          token: await issueSignedToken({
+            ...limits,
+            pathname,
+            operations: ["put"],
+          }),
+          urlOptions: {
+            ...limits,
+            addRandomSuffix: true,
+            allowOverwrite: false,
+          },
         };
       },
-      // The editor stores the URL itself when it saves; nothing to do here.
-      onUploadCompleted: async () => {},
+      // No onUploadCompleted: the editor stores the URL itself when it saves.
     });
     return Response.json(result);
   } catch (error) {
     return Response.json(
       { error: error instanceof Error ? error.message : "Upload failed." },
-      { status: 400 },
+      { status: error instanceof SignedOutError ? 401 : 400 },
     );
   }
 }

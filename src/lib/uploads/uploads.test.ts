@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { altFromFileName } from "./client";
+import { getUploadMode } from "./server";
 import { isImageType } from "./shared";
 import { hasImageSignature } from "./signature";
 
@@ -77,5 +78,43 @@ describe("altFromFileName", () => {
 
   it("falls back to a generic description", () => {
     expect(altFromFileName(".png")).toBe("Image");
+  });
+});
+
+describe("getUploadMode", () => {
+  const noStore = () => {
+    vi.stubEnv("BLOB_STORE_ID", "");
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "");
+  };
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("uses Blob when a store is connected, by id or by token", () => {
+    noStore();
+    vi.stubEnv("BLOB_STORE_ID", "store_abc123");
+    expect(getUploadMode()).toBe("blob");
+
+    noStore();
+    vi.stubEnv("BLOB_READ_WRITE_TOKEN", "vercel_blob_rw_abc123");
+    expect(getUploadMode()).toBe("blob");
+  });
+
+  it("saves to disk in development and in the end-to-end tests", () => {
+    noStore();
+    vi.stubEnv("NODE_ENV", "development");
+    expect(getUploadMode()).toBe("local");
+
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("LOCAL_UPLOADS", "true");
+    expect(getUploadMode()).toBe("local");
+  });
+
+  it("turns uploads off in production without a store", () => {
+    noStore();
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("LOCAL_UPLOADS", "");
+    expect(getUploadMode()).toBe("disabled");
   });
 });

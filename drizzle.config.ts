@@ -5,8 +5,9 @@ import { defineConfig } from "drizzle-kit";
 loadEnvConfig(process.cwd(), process.env.NODE_ENV !== "production");
 
 // Migrations need a direct connection: Neon's pooled URL runs through PgBouncer,
-// which can't hold the session state migrations rely on.
-const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+// which can't hold the session state migrations rely on. An empty value counts
+// as unset.
+const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
 
 if (!url) {
   // Variable names only, never values: shows whether the database variables
@@ -14,10 +15,11 @@ if (!url) {
   // integration prefix, say).
   const related = Object.keys(process.env)
     .filter((name) => /DATABASE|POSTGRES|NEON|^PG/.test(name))
-    .sort();
+    .sort()
+    .map((name) => (process.env[name] ? name : `${name} (empty)`));
   throw new Error(
     [
-      "DATABASE_URL is not set. Copy .env.example to .env.local and try again.",
+      "Neither DATABASE_URL_UNPOOLED nor DATABASE_URL has a value. Copy .env.example to .env.local and try again.",
       related.length > 0
         ? `Database-related variables that are set: ${related.join(", ")}`
         : "No database-related variables are set.",

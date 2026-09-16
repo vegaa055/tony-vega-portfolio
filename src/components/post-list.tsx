@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { PostSummary } from "@/data/posts";
+import { displayFont } from "@/lib/fonts";
 import { formatDate, isoDate } from "@/lib/format";
 
 type PostListProps = {
@@ -25,7 +26,9 @@ export function PostList({
             </p>
 
             <div>
-              <Heading className="text-xl font-medium tracking-tight text-balance text-star transition-colors duration-300 group-hover:text-flare-soft sm:text-2xl">
+              <Heading
+                className={`${displayFont.className} text-xl tracking-[-0.01em] text-balance wrap-anywhere text-star transition-colors duration-300 group-hover:text-flare-soft sm:text-2xl`}
+              >
                 <Link
                   href={`/blog/${post.slug}`}
                   className="outline-none after:absolute after:inset-0"

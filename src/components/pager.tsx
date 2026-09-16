@@ -2,6 +2,8 @@ import clsx from "clsx";
 import type { Route } from "next";
 import Link from "next/link";
 
+import { displayFont } from "@/lib/fonts";
+
 type PagerLink = {
   href: Route;
   title: string;
@@ -57,7 +59,9 @@ function PagerCard({
         {/* Keeps screen readers from running the caption into the title. */}
         <span className="sr-only">: </span>
       </span>
-      <span className="mt-3 block text-lg font-medium tracking-tight text-balance text-star transition-colors duration-300 group-hover:text-flare-soft sm:text-xl">
+      <span
+        className={`${displayFont.className} mt-3 block text-lg tracking-[-0.01em] text-balance wrap-anywhere text-star transition-colors duration-300 group-hover:text-flare-soft sm:text-xl`}
+      >
         {link.title}
       </span>
     </Link>

@@ -90,7 +90,7 @@ export default async function ProjectPage({
           </p>
 
           <h1
-            className={`${displayFont.className} mt-5 max-w-4xl animate-rise text-[clamp(1.8rem,4.8vw,3.4rem)] leading-[1.1] tracking-[-0.01em] text-balance [animation-delay:80ms]`}
+            className={`${displayFont.className} mt-5 max-w-4xl animate-rise text-[clamp(1.8rem,4.8vw,3.4rem)] leading-[1.1] tracking-[-0.01em] text-balance wrap-anywhere [animation-delay:80ms]`}
           >
             {project.title}
           </h1>

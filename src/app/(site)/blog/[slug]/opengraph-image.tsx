@@ -27,7 +27,7 @@ export default async function Image({
   return renderCard({
     kicker: `${formatDate(post.publishedAt)} · ${post.readingMinutes} min read`,
     title: post.title,
-    titleFont: "sans",
+    titleFont: "display",
     description: post.excerpt,
     imageUrl: post.coverImage?.url,
   });

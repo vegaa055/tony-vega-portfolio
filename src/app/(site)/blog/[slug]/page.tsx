@@ -6,6 +6,7 @@ import { BackLink } from "@/components/back-link";
 import { JsonLd } from "@/components/json-ld";
 import { Pager } from "@/components/pager";
 import { getPublishedPost, getPublishedPosts } from "@/data/posts";
+import { displayFont } from "@/lib/fonts";
 import { formatDate, isoDate } from "@/lib/format";
 import { blogPostingJsonLd } from "@/lib/json-ld";
 import { renderMarkdown } from "@/lib/markdown/render";
@@ -72,7 +73,9 @@ export default async function PostPage({ params }: PageProps<"/blog/[slug]">) {
             </time>{" "}
             · {post.readingMinutes} min read
           </p>
-          <h1 className="mt-5 animate-rise text-[clamp(2.1rem,5vw,3.25rem)] leading-[1.1] font-medium tracking-tight text-balance text-star [animation-delay:80ms]">
+          <h1
+            className={`${displayFont.className} mt-5 animate-rise text-[clamp(1.7rem,4.4vw,2.75rem)] leading-[1.15] tracking-[-0.01em] text-balance wrap-anywhere text-star [animation-delay:80ms]`}
+          >
             {post.title}
           </h1>
           {post.excerpt ? (

@@ -53,7 +53,7 @@ export function ProjectCard({
       </p>
 
       <Heading
-        className={`${displayFont.className} mt-2 text-xl tracking-[-0.01em] text-star sm:text-2xl`}
+        className={`${displayFont.className} mt-2 text-xl tracking-[-0.01em] wrap-anywhere text-star sm:text-2xl`}
       >
         <Link
           href={`/projects/${project.slug}`}

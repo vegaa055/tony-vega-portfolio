@@ -72,18 +72,12 @@ const STARS = [
 ] as const;
 
 /**
- * Title fonts, matching the site: mono for pages, sans for posts, and Michroma
- * for names (the home page and projects). `em` is an average letter's width,
+ * Title fonts, matching the site: mono for page names, and Michroma for your
+ * name and for project and post titles. `em` is an average letter's width,
  * used to size titles.
  */
 const TITLE_FONTS = {
   mono: { family: "Martian Mono", weight: 300, letterSpacing: -1.5, em: 0.66 },
-  sans: {
-    family: "Instrument Sans",
-    weight: 500,
-    letterSpacing: -0.5,
-    em: 0.5,
-  },
   display: { family: "Michroma", weight: 400, letterSpacing: -0.5, em: 0.81 },
 } as const;
 
@@ -227,7 +221,7 @@ async function drawCard({
               fontSize: titleSize(title, titleFont),
               lineHeight: 1.08,
               letterSpacing: TITLE_FONTS[titleFont].letterSpacing,
-              lineClamp: 3,
+              lineClamp: 4,
             }}
           >
             {title}
@@ -281,7 +275,7 @@ async function drawCard({
 
 /**
  * The largest title size that fits on two lines, or failing that on three.
- * Longer titles are cut off after three lines.
+ * Longer titles get smaller sizes and up to four lines, then are cut off.
  */
 function titleSize(title: string, font: TitleFont) {
   // Leave some room for lines that break early.
@@ -289,8 +283,9 @@ function titleSize(title: string, font: TitleFont) {
   const lines = (size: number) => Math.ceil((ems * size) / TEXT_WIDTH);
   return (
     [76, 60, 50].find((size) => lines(size) <= 2) ??
-    [60, 50].find((size) => lines(size) <= 3) ??
-    42
+    [60, 50, 42].find((size) => lines(size) <= 3) ??
+    [36, 32].find((size) => lines(size) <= 4) ??
+    32
   );
 }
 
@@ -301,18 +296,16 @@ function titleSize(title: string, font: TitleFont) {
 async function loadFonts() {
   const file = (name: string) =>
     readFile(path.join(process.cwd(), "assets/fonts", name));
-  const [monoLight, mono, sans, sansMedium, michroma] = await Promise.all([
+  const [monoLight, mono, sans, michroma] = await Promise.all([
     file("martian-mono-latin-300-normal.woff"),
     file("martian-mono-latin-400-normal.woff"),
     file("instrument-sans-latin-400-normal.woff"),
-    file("instrument-sans-latin-500-normal.woff"),
     file("michroma-latin-400-normal.woff"),
   ]);
   return [
     { name: "Martian Mono", data: monoLight, weight: 300 as const },
     { name: "Martian Mono", data: mono, weight: 400 as const },
     { name: "Instrument Sans", data: sans, weight: 400 as const },
-    { name: "Instrument Sans", data: sansMedium, weight: 500 as const },
     { name: "Michroma", data: michroma, weight: 400 as const },
   ];
 }

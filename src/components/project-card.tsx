@@ -4,6 +4,7 @@ import { ChipList } from "@/components/chip-list";
 import { ProjectCover } from "@/components/project-cover";
 import { Reticle } from "@/components/reticle";
 import type { ProjectSummary } from "@/data/projects";
+import { displayFont } from "@/lib/fonts";
 import { catalogNumber, yearOf } from "@/lib/format";
 
 type ProjectCardProps = {
@@ -51,7 +52,9 @@ export function ProjectCard({
         {year ? <span>{year}</span> : null}
       </p>
 
-      <Heading className="mt-2 text-xl font-medium tracking-tight text-star sm:text-2xl">
+      <Heading
+        className={`${displayFont.className} mt-2 text-xl tracking-[-0.01em] text-star sm:text-2xl`}
+      >
         <Link
           href={`/projects/${project.slug}`}
           className="outline-none after:absolute after:inset-0"

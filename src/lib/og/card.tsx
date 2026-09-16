@@ -72,9 +72,9 @@ const STARS = [
 ] as const;
 
 /**
- * Title fonts, matching the site: mono for pages and projects, sans for posts,
- * and Michroma for the name on the home page. `em` is an average letter's
- * width, used to size titles.
+ * Title fonts, matching the site: mono for pages, sans for posts, and Michroma
+ * for names (the home page and projects). `em` is an average letter's width,
+ * used to size titles.
  */
 const TITLE_FONTS = {
   mono: { family: "Martian Mono", weight: 300, letterSpacing: -1.5, em: 0.66 },

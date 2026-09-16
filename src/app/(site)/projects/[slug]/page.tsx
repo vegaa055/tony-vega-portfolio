@@ -16,6 +16,7 @@ import {
   getPublishedProjects,
   type ProjectDetail,
 } from "@/data/projects";
+import { displayFont } from "@/lib/fonts";
 import { catalogNumber, yearOf } from "@/lib/format";
 import { projectJsonLd } from "@/lib/json-ld";
 import { renderMarkdown } from "@/lib/markdown/render";
@@ -88,7 +89,9 @@ export default async function ProjectPage({
             {year ?? "Project"}
           </p>
 
-          <h1 className="mt-5 max-w-4xl animate-rise font-mono text-[clamp(2.25rem,6vw,4.25rem)] leading-[1.02] font-extralight tracking-[-0.03em] text-balance font-stretch-semi-expanded [animation-delay:80ms]">
+          <h1
+            className={`${displayFont.className} mt-5 max-w-4xl animate-rise text-[clamp(1.8rem,4.8vw,3.4rem)] leading-[1.1] tracking-[-0.01em] text-balance [animation-delay:80ms]`}
+          >
             {project.title}
           </h1>
 

@@ -1,5 +1,3 @@
-import { Michroma } from "next/font/google";
-
 import { ButtonLink } from "@/components/button-link";
 import { EmptyState } from "@/components/empty-state";
 import { HeroScene } from "@/components/hero/hero-scene";
@@ -10,14 +8,11 @@ import { SectionHeading } from "@/components/section-heading";
 import { siteConfig } from "@/config/site";
 import { getLatestPosts } from "@/data/posts";
 import { getFeaturedProjects, getPublishedProjects } from "@/data/projects";
+import { displayFont } from "@/lib/fonts";
 import { websiteJsonLd } from "@/lib/json-ld";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({ path: "/" });
-
-// Only the name in the hero uses Michroma, so it's loaded on this page alone.
-// It comes in a single weight.
-const michroma = Michroma({ subsets: ["latin"], weight: "400" });
 
 export default function HomePage() {
   return (
@@ -35,7 +30,7 @@ export default function HomePage() {
             </p>
 
             <h1
-              className={`${michroma.className} mt-7 animate-rise text-[clamp(2.75rem,8.2vw,5.6rem)] leading-[1.05] font-normal tracking-[-0.01em] [animation-delay:80ms]`}
+              className={`${displayFont.className} mt-7 animate-rise text-[clamp(2.75rem,8.2vw,5.6rem)] leading-[1.05] font-normal tracking-[-0.01em] [animation-delay:80ms]`}
             >
               Tony
               <br />

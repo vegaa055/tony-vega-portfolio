@@ -28,6 +28,7 @@ export default async function Image({
   return renderCard({
     kicker: year ? `Project · ${year}` : "Project",
     title: project.title,
+    titleFont: "display",
     description: project.tagline || project.summary,
     imageUrl: project.coverImage?.url,
   });

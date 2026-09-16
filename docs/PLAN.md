@@ -20,7 +20,7 @@ before the next phase starts.
 | Images | Vercel Blob | Built into Vercel. |
 | Writing format | Markdown with live preview | Portable and easy to back up. |
 | Admin approach | Custom-built | Three content types don't need a full CMS, and the admin itself is portfolio work. |
-| Look | "Cosmic dark" | Deep-space neutrals, one warm accent, Martian Mono + Instrument Sans. |
+| Look | "Cosmic dark" | Deep-space neutrals, one warm accent, Martian Mono + Instrument Sans. Michroma for names: the home page heading and project titles (`src/lib/fonts.ts`). |
 | Name | Tony Vega | Domain not decided yet; `NEXT_PUBLIC_SITE_URL` keeps it configurable. |
 | Older projects | Imported as hidden drafts | 7 from the Flask portfolio + 3 games from the static site. |
 

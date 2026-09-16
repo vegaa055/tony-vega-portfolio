@@ -118,7 +118,8 @@ async function drawCard({
     loadFonts(),
     imageForCard(imageUrl),
   ]);
-  const host = new URL(siteConfig.url).host;
+  // The short form of the address, even though the site lives on www.
+  const host = new URL(siteConfig.url).host.replace(/^www\./, "");
 
   const response = new ImageResponse(
     <div

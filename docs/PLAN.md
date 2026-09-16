@@ -21,7 +21,7 @@ before the next phase starts.
 | Writing format | Markdown with live preview | Portable and easy to back up. |
 | Admin approach | Custom-built | Three content types don't need a full CMS, and the admin itself is portfolio work. |
 | Look | "Cosmic dark" | Deep-space neutrals, one warm accent, Martian Mono + Instrument Sans. Michroma for the home page heading and for project and post titles wherever they appear, including share cards (`src/lib/fonts.ts`). |
-| Name | Tony Vega | Domain not decided yet; `NEXT_PUBLIC_SITE_URL` keeps it configurable. |
+| Name | Tony Vega | At www.tonyvega.io; `NEXT_PUBLIC_SITE_URL` sets the address. |
 | Older projects | Imported as hidden drafts | 7 from the Flask portfolio + 3 games from the static site. |
 
 ## Content model
@@ -87,7 +87,7 @@ Performance swung between runs (81 to 99 on the home page) because the machine w
 
 ### Phase 5: Deploy to Vercel
 
-Live at https://tony-vega-portfolio.vercel.app since 2026-09-16.
+Live since 2026-09-16 at https://www.tonyvega.io. The first address, https://tony-vega-portfolio.vercel.app, redirects there.
 
 - [x] **Tony:** GitHub repo, Vercel project, Neon and Blob connected from the Vercel dashboard
 - [x] Migrations run on every deploy (`vercel-build`); production seeded; production admin account created
@@ -95,7 +95,7 @@ Live at https://tony-vega-portfolio.vercel.app since 2026-09-16.
 - [x] Smoke test of the live site: pages, headers, robots, sitemap, feed, share cards, the admin locked, and drafts hidden (25 checks, all passing)
 - [x] **Tony:** saved an edit with an uploaded image on the live site (Blob with OIDC; see notes)
 - [ ] **Tony:** turn on two-factor login on the live site
-- [ ] Optional: a custom domain (then update `NEXT_PUBLIC_SITE_URL` and redeploy)
+- [x] **Tony:** custom domain tonyvega.io, with `www.tonyvega.io` as the main address and `NEXT_PUBLIC_SITE_URL` pointing to it
 
 **Lighthouse on the live site** (same settings as Phase 4, 2026-09-16, median of three runs):
 
@@ -225,6 +225,14 @@ Things discovered along the way that will matter later.
   address (`NEXT_PUBLIC_VERCEL_BRANCH_URL`, which needs Vercel's
   "Automatically expose System Environment Variables", on by default) and are
   trusted through `VERCEL_URL` and `VERCEL_BRANCH_URL`.
+- **Custom domain:** `www.tonyvega.io` is the main address. `tonyvega.io` and
+  `tony-vega-portfolio.vercel.app` redirect to it (Domains settings). The
+  login only accepts requests from `NEXT_PUBLIC_SITE_URL` (and preview
+  deployments' own addresses), so any other address that serves production
+  must redirect rather than serve the site. The domain was bought at
+  Hostinger but uses Vercel's nameservers, so DNS records are edited in
+  Vercel; there are no email (MX) records yet. Share cards print the address
+  without `www.`.
 - **Running the admin scripts against production:** set
   `DATABASE_URL_UNPOOLED` to Neon's direct connection string in the shell (it
   wins over `.env.local`), run the script, then clear the variable. See the

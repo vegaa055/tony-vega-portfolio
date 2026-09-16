@@ -1,7 +1,7 @@
 # Tony Vega — portfolio
 
 Personal portfolio and blog with a private admin panel. Live at
-https://tony-vega-portfolio.vercel.app
+https://www.tonyvega.io
 
 - **Next.js 16.3** (App Router, Cache Components) + **TypeScript**
 - **Tailwind CSS 4.3**
@@ -147,6 +147,17 @@ A failed migration fails the deploy rather than breaking the live site.
 
 Preview deployments get their own Neon branch, and `robots.ts` keeps them out
 of search results.
+
+**Custom domain** (`www.tonyvega.io`):
+
+1. Under **Domains**, add `www.tonyvega.io` and `tonyvega.io`, with the bare
+   domain redirecting to www. The domain uses Vercel's nameservers, so its DNS
+   records (email included) are edited in Vercel, not at the registrar.
+2. Edit `tony-vega-portfolio.vercel.app` to redirect to `www.tonyvega.io`.
+3. Set `NEXT_PUBLIC_SITE_URL` to `https://www.tonyvega.io` and redeploy. The
+   admin login only accepts that address (and preview deployments' own
+   addresses), which is why the other addresses redirect instead of serving
+   the site.
 
 ## Project layout
 

@@ -83,13 +83,28 @@ Defined in `src/db/schema.ts`.
 | Project (3D Solar System) | 94 | 100 | 100 | 100 |
 | Post (Rebuilding my portfolio) | 100 | 100 | 100 | 100 |
 
-Performance swung between runs (81 to 99 on the home page) because the machine was busy, so measure again on Vercel in Phase 5. The weakest number is the project page's Largest Contentful Paint (its title) at 2.3 to 3.0s in Lighthouse's slow-4G simulation. The server answers from its cache in under 100ms, so check it again after deploying before changing anything for it.
+Performance swung between runs (81 to 99 on the home page) because the machine was busy. The weakest number was the project page's Largest Contentful Paint (its title) at 2.3 to 3.0s in Lighthouse's slow-4G simulation; on the live site it's 1.6 to 2.3s (see Phase 5).
 
 ### Phase 5: Deploy to Vercel
 
-- [ ] **Tony:** GitHub repo, Vercel project, add Neon and Blob from the Vercel dashboard
-- [ ] Run migrations against Neon, create the production admin account
-- [ ] Security headers, smoke test, optional custom domain
+Live at https://tony-vega-portfolio.vercel.app since 2026-09-16.
+
+- [x] **Tony:** GitHub repo, Vercel project, Neon and Blob connected from the Vercel dashboard
+- [x] Migrations run on every deploy (`vercel-build`); production seeded; production admin account created
+- [x] Security headers on every response: Content-Security-Policy, HSTS, nosniff, Referrer-Policy, framing protection, Permissions-Policy, and a same-origin opener policy
+- [x] Smoke test of the live site: pages, headers, robots, sitemap, feed, share cards, the admin locked, and drafts hidden (25 checks, all passing)
+- [ ] **Tony:** turn on two-factor login, and save one edit with an uploaded image on the live site
+- [ ] Optional: a custom domain (then update `NEXT_PUBLIC_SITE_URL` and redeploy)
+
+**Lighthouse on the live site** (same settings as Phase 4, 2026-09-16, median of three runs):
+
+| Page | Performance | Accessibility | Best practices | SEO |
+| --- | --- | --- | --- | --- |
+| Home | 88 | 100 | 100 | 100 |
+| Project (3D Solar System) | 99 | 100 | 100 | 100 |
+| Post (Rebuilding my portfolio) | 97 | 100 | 100 | 100 |
+
+Largest Contentful Paint is 1.6 to 2.3s on all three pages (under 2.5s counts as good). The home page scores lower (72 to 90) only on Speed Index and main-thread time: the orrery placeholder never stops moving, so Lighthouse can't call the page visually finished, and its 3D transforms keep the test browser busy. See the note under "Later: 3D hero".
 
 ### Later: 3D hero
 
@@ -97,6 +112,11 @@ Swap the placeholder in `src/components/hero/hero-scene.tsx` for a Three.js
 `WebGPURenderer` scene (falls back to WebGL 2 automatically). Load it client-side
 only, and keep the placeholder as the loading state and the reduced-motion
 fallback.
+
+Motion that never stops costs the home page in Lighthouse (Speed Index keeps
+climbing while anything moves; see the Phase 5 scores). Start the scene's motion
+after the page has loaded, pause it while it's off screen or the tab is hidden,
+and check the home page's Lighthouse score before and after.
 
 ## Notes for later phases
 
@@ -191,17 +211,34 @@ Things discovered along the way that will matter later.
   production on Vercel, or behind a proxy that overwrites the header.
 - **Node.js 24:** required by `package.json` (`engines`). CI and Vercel read
   the version from there.
-- **Phase 5, Neon:** the Vercel integration sets `DATABASE_URL` (pooled, for the
-  app) and `DATABASE_URL_UNPOOLED` (direct, for migrations). Cache Components
+- **Neon on Vercel:** connect the database with no custom prefix. With one
+  (the first attempt got `STORAGE_`), the variables become
+  `STORAGE_DATABASE_URL` and so on, and the build can't find the database.
+  Don't add `DATABASE_URL` or `DATABASE_URL_UNPOOLED` by hand; the connection
+  manages both (pooled for the app, direct for migrations). Cache Components
   requires the Node.js runtime, so no route may use the Edge runtime.
-- **Phase 5, auth settings:** set `BETTER_AUTH_SECRET` (a new value, not the
-  local one) and `NEXT_PUBLIC_SITE_URL` in Vercel. Preview deployments are
-  trusted automatically through `VERCEL_URL` and `VERCEL_BRANCH_URL`. Create the
-  production account by running `npm run admin:create` with `DATABASE_URL`
-  pointing at Neon.
-- **Phase 5, Blob:** create the Blob store with public access. Connecting it
-  sets `BLOB_READ_WRITE_TOKEN`; without it, production uploads are turned off
-  and the editor says so.
+- **Auth settings on Vercel:** `BETTER_AUTH_SECRET` is a Secret for Production
+  and Preview; only Vercel knows it, and the admin scripts don't need it
+  (passwords are hashed without it). `NEXT_PUBLIC_SITE_URL` is a Config
+  variable for Production only. Preview deployments fall back to their own
+  address (`NEXT_PUBLIC_VERCEL_BRANCH_URL`, which needs Vercel's
+  "Automatically expose System Environment Variables", on by default) and are
+  trusted through `VERCEL_URL` and `VERCEL_BRANCH_URL`.
+- **Running the admin scripts against production:** set
+  `DATABASE_URL_UNPOOLED` to Neon's direct connection string in the shell (it
+  wins over `.env.local`), run the script, then clear the variable. See the
+  README's Deploying section.
+- **Changing production data outside the admin** (seeding, SQL): redeploy
+  without the build cache. Prerendered pages refresh only through admin saves
+  (cache tags) or a new build.
+- **Blob:** create the store with public access. Connecting it sets
+  `BLOB_READ_WRITE_TOKEN`; without it, production uploads are turned off and
+  the editor says so. Browsers upload straight to Blob, which the
+  Content-Security-Policy allows (`vercel.com` and
+  `*.blob.vercel-storage.com`).
+- **Content-Security-Policy:** it lives in `next.config.ts`. Adding a
+  third-party script, font, image host, or API means adding it there too, or
+  browsers block it (the console says which directive).
 - **Tooling:** ESLint stays on v9. `eslint-config-next` 16.3.5 bundles an
   `eslint-plugin-react` that crashes on ESLint 10.
 - **Tooling:** `npm audit` reports a moderate esbuild issue inside `drizzle-kit`

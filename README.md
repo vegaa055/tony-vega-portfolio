@@ -1,6 +1,7 @@
 # Tony Vega — portfolio
 
-Personal portfolio and blog with a private admin panel.
+Personal portfolio and blog with a private admin panel. Live at
+https://tony-vega-portfolio.vercel.app
 
 - **Next.js 16.3** (App Router, Cache Components) + **TypeScript**
 - **Tailwind CSS 4.3**
@@ -110,26 +111,35 @@ images.
 **First time:**
 
 1. Import the GitHub repo into Vercel. Next.js is detected automatically.
-2. Add **Neon Postgres** and a **Blob** store from the Vercel marketplace. They
-   set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `BLOB_READ_WRITE_TOKEN`.
-3. Add `BETTER_AUTH_SECRET` (a fresh value, see [.env.example](.env.example))
-   for Production and Preview, and `NEXT_PUBLIC_SITE_URL` (the site's address)
-   for **Production only** — preview deployments use their own address.
-4. Let Vercel deploy once. The build applies the migrations, so the database
-   now has its tables (the site is still empty).
+2. In the project's **Storage** tab, add **Neon Postgres** and a **Blob**
+   store. When connecting Neon, leave **Custom Prefix** empty: the app reads
+   `DATABASE_URL` and `DATABASE_URL_UNPOOLED` by those exact names. Don't add
+   them by hand.
+3. Add `BETTER_AUTH_SECRET` as a **Secret** (a fresh value, see
+   [.env.example](.env.example)) for Production and Preview, and
+   `NEXT_PUBLIC_SITE_URL` as **Config** (the site's address) for
+   **Production only**, so preview deployments use their own address.
+4. Deploy. The build applies the migrations, so the database gets its tables
+   (the site is still empty).
 5. Load the starting content and create the admin account from your machine,
-   pointing them at Neon's **direct** (unpooled) connection string. Variables
-   set in the shell win over `.env.local`, so your local database is untouched:
+   using Neon's **direct** connection string (its host has no `-pooler`).
+   Variables set in the shell win over `.env.local`, and neither script needs
+   the production secret (passwords are hashed without it):
 
    ```powershell
-   $env:DATABASE_URL_UNPOOLED = "<neon direct url>"
+   $env:DATABASE_URL_UNPOOLED = "<neon direct connection string>"
    npm run db:seed
-   $env:BETTER_AUTH_SECRET = "<the production secret>"
    npm run admin:create
+   Remove-Item Env:DATABASE_URL_UNPOOLED
    ```
 
-6. Redeploy in Vercel so the pages are built with the content, then sign in at
-   `/admin` and turn on two-factor login under Security.
+   The last line keeps later commands in that window off the live database.
+   `npm run admin:reset` works against production the same way.
+
+6. Redeploy **without the build cache**. Pages built from an empty database
+   don't refresh on their own when the database is changed directly (admin
+   saves do refresh them). Then sign in at `/admin` and turn on two-factor
+   login under Security.
 
 **Every deploy after that** runs `npm run vercel-build`, which applies pending
 migrations before building, so the database schema never lags behind the code.

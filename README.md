@@ -102,6 +102,36 @@ Once the repository is on GitHub, GitHub Actions runs formatting, lint, types,
 unit tests, and the end-to-end tests on each push to `main` and on pull
 requests (`.github/workflows/ci.yml`).
 
+## Deploying
+
+The site runs on Vercel, with Neon for Postgres and Vercel Blob for uploaded
+images.
+
+**First time:**
+
+1. Import the GitHub repo into Vercel. Next.js is detected automatically.
+2. Add **Neon Postgres** and a **Blob** store from the Vercel marketplace. They
+   set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `BLOB_READ_WRITE_TOKEN`.
+3. Add `BETTER_AUTH_SECRET` (a fresh value, see [.env.example](.env.example))
+   for Production and Preview, and `NEXT_PUBLIC_SITE_URL` (the site's address)
+   for **Production only** — preview deployments use their own address.
+4. Load the starting content and create the admin account, pointing the
+   commands at Neon:
+
+   ```bash
+   DATABASE_URL_UNPOOLED="<neon direct url>" npm run db:seed
+   DATABASE_URL_UNPOOLED="<neon direct url>" BETTER_AUTH_SECRET="<the production secret>" npm run admin:create
+   ```
+
+5. Sign in at `/admin`, then turn on two-factor login under Security.
+
+**Every deploy after that** runs `npm run vercel-build`, which applies pending
+migrations before building, so the database schema never lags behind the code.
+A failed migration fails the deploy rather than breaking the live site.
+
+Preview deployments get their own Neon branch, and `robots.ts` keeps them out
+of search results.
+
 ## Project layout
 
 ```

@@ -11,12 +11,25 @@ const nav: NavItem[] = [
   { href: "/about", label: "About" },
 ];
 
+/**
+ * The site's own address, used for absolute links, metadata, and the admin
+ * login's origin checks. NEXT_PUBLIC_SITE_URL is set for the live site only,
+ * so Vercel preview deployments fall back to their own address.
+ */
+function siteUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
+  const preview =
+    process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL;
+  return preview ? `https://${preview}` : "http://localhost:3000";
+}
+
 export const siteConfig = {
   name: "Tony Vega",
   role: "Software developer",
   description:
     "Tony Vega builds interactive simulations, software synthesizers, and web applications.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  url: siteUrl(),
   nav,
   links: {
     github: "https://github.com/vegaa055",

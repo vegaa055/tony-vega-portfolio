@@ -3,6 +3,7 @@ import { betterAuth, type BetterAuthPlugin } from "better-auth";
 import { twoFactor } from "better-auth/plugins";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 
+import { siteConfig } from "@/config/site";
 import type * as schema from "@/db/schema";
 
 type CreateAuthOptions = {
@@ -20,8 +21,9 @@ type CreateAuthOptions = {
 };
 
 function trustedOrigins() {
-  const origins = [process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"];
-  // Vercel preview deployments are served from their own URLs.
+  // siteConfig.url is the live site, or a preview deployment's own address.
+  const origins = [siteConfig.url];
+  // Preview deployments also answer on their per-deployment URL.
   for (const host of [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]) {
     if (host) origins.push(`https://${host}`);
   }
@@ -40,7 +42,7 @@ export function createAuth({
 }: CreateAuthOptions) {
   return betterAuth({
     appName: "Tony Vega",
-    baseURL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    baseURL: siteConfig.url,
     trustedOrigins: trustedOrigins(),
     database: drizzleAdapter(db, { provider: "pg", schema, usePlural: true }),
     emailAndPassword: {

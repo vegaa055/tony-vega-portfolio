@@ -9,8 +9,24 @@ loadEnvConfig(process.cwd(), process.env.NODE_ENV !== "production");
 const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 
 if (!url) {
+  // Variable names only, never values: shows whether the database variables
+  // are missing entirely or were added under other names (a Vercel
+  // integration prefix, say).
+  const related = Object.keys(process.env)
+    .filter((name) => /DATABASE|POSTGRES|NEON|^PG/.test(name))
+    .sort();
   throw new Error(
-    "DATABASE_URL is not set. Copy .env.example to .env.local and try again.",
+    [
+      "DATABASE_URL is not set. Copy .env.example to .env.local and try again.",
+      related.length > 0
+        ? `Database-related variables that are set: ${related.join(", ")}`
+        : "No database-related variables are set.",
+      process.env.VERCEL_ENV
+        ? `Vercel environment: ${process.env.VERCEL_ENV}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
   );
 }
 

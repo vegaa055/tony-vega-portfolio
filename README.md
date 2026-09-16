@@ -115,15 +115,21 @@ images.
 3. Add `BETTER_AUTH_SECRET` (a fresh value, see [.env.example](.env.example))
    for Production and Preview, and `NEXT_PUBLIC_SITE_URL` (the site's address)
    for **Production only** — preview deployments use their own address.
-4. Load the starting content and create the admin account, pointing the
-   commands at Neon:
+4. Let Vercel deploy once. The build applies the migrations, so the database
+   now has its tables (the site is still empty).
+5. Load the starting content and create the admin account from your machine,
+   pointing them at Neon's **direct** (unpooled) connection string. Variables
+   set in the shell win over `.env.local`, so your local database is untouched:
 
-   ```bash
-   DATABASE_URL_UNPOOLED="<neon direct url>" npm run db:seed
-   DATABASE_URL_UNPOOLED="<neon direct url>" BETTER_AUTH_SECRET="<the production secret>" npm run admin:create
+   ```powershell
+   $env:DATABASE_URL_UNPOOLED = "<neon direct url>"
+   npm run db:seed
+   $env:BETTER_AUTH_SECRET = "<the production secret>"
+   npm run admin:create
    ```
 
-5. Sign in at `/admin`, then turn on two-factor login under Security.
+6. Redeploy in Vercel so the pages are built with the content, then sign in at
+   `/admin` and turn on two-factor login under Security.
 
 **Every deploy after that** runs `npm run vercel-build`, which applies pending
 migrations before building, so the database schema never lags behind the code.

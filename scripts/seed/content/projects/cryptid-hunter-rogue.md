@@ -1,4 +1,4 @@
-A 2D roguelike dungeon crawler. Players take on the role of a cryptid hunter, venturing into dark forests and ancient ruins to uncover the secrets of legendary creatures. Each run offers new challenges and unique loot.
+A 2D roguelike shooter. Players take on the role of a cryptid hunter, venturing into dark forests and ancient ruins to uncover the secrets of legendary creatures. Each run offers new challenges and unique loot.
 
 ## Features
 

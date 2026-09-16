@@ -97,6 +97,7 @@ export const projectSeeds: ProjectSeed[] = [
     techStack: ["Next.js", "React", "TypeScript", "Neo4j", "Leaflet"],
     tags: ["Web", "Data"],
     repoUrl: "https://github.com/vegaa055/myth-tracker",
+    liveUrl: "https://myth-tracker.vercel.app/",
     featured: true,
     sortOrder: 30,
     status: "published",
@@ -217,9 +218,9 @@ export const projectSeeds: ProjectSeed[] = [
     slug: "cryptid-hunter-rogue",
     title: "Cryptid Hunter: Rogue",
     tagline:
-      "A 2D roguelike dungeon crawler with procedural dungeons, pathfinding enemies, and 2D lighting.",
+      "A 2D roguelike shooter with procedural dungeons, pathfinding enemies, and 2D lighting.",
     summary:
-      "A 2D roguelike built in Unity and C#, with procedurally generated dungeons, enemies that use A* pathfinding, shader effects, and 2D lighting and shadows.",
+      "A 2D roguelike shooter built in Unity and C#, with procedurally generated dungeons, enemies that use A* pathfinding, shader effects, and 2D lighting and shadows.",
     bodyFile: "projects/cryptid-hunter-rogue.md",
     coverImage: image(
       "/images/projects/cryptid-hunter-rogue/forest-level.webp",

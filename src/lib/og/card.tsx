@@ -71,12 +71,29 @@ const STARS = [
   [1068, 36, 1, 0.4],
 ] as const;
 
+/**
+ * Title fonts, matching the site: mono for pages and projects, sans for posts,
+ * and Michroma for the name on the home page. `em` is an average letter's
+ * width, used to size titles.
+ */
+const TITLE_FONTS = {
+  mono: { family: "Martian Mono", weight: 300, letterSpacing: -1.5, em: 0.66 },
+  sans: {
+    family: "Instrument Sans",
+    weight: 500,
+    letterSpacing: -0.5,
+    em: 0.5,
+  },
+  display: { family: "Michroma", weight: 400, letterSpacing: -0.5, em: 0.81 },
+} as const;
+
+type TitleFont = keyof typeof TITLE_FONTS;
+
 type CardOptions = {
   /** A short line above the title, like "Project · 2026". */
   kicker: string;
   title: string;
-  /** Mono for page and project titles; sans for post titles, like the site. */
-  titleFont?: "mono" | "sans";
+  titleFont?: TitleFont;
   description?: string;
   /** A site image for the right side, like a project's cover. */
   imageUrl?: string;
@@ -205,12 +222,11 @@ async function drawCard({
             style={{
               display: "block",
               marginTop: 22,
-              fontFamily:
-                titleFont === "mono" ? "Martian Mono" : "Instrument Sans",
-              fontWeight: titleFont === "mono" ? 300 : 500,
+              fontFamily: TITLE_FONTS[titleFont].family,
+              fontWeight: TITLE_FONTS[titleFont].weight,
               fontSize: titleSize(title, titleFont),
               lineHeight: 1.08,
-              letterSpacing: titleFont === "mono" ? -1.5 : -0.5,
+              letterSpacing: TITLE_FONTS[titleFont].letterSpacing,
               lineClamp: 3,
             }}
           >
@@ -267,10 +283,9 @@ async function drawCard({
  * The largest title size that fits on two lines, or failing that on three.
  * Longer titles are cut off after three lines.
  */
-function titleSize(title: string, font: "mono" | "sans") {
-  // An average letter's width in ems (mono letters are wider), with some room
-  // for lines that break early.
-  const ems = title.length * (font === "mono" ? 0.66 : 0.5) * 1.15;
+function titleSize(title: string, font: TitleFont) {
+  // Leave some room for lines that break early.
+  const ems = title.length * TITLE_FONTS[font].em * 1.15;
   const lines = (size: number) => Math.ceil((ems * size) / TEXT_WIDTH);
   return (
     [76, 60, 50].find((size) => lines(size) <= 2) ??
@@ -286,17 +301,19 @@ function titleSize(title: string, font: "mono" | "sans") {
 async function loadFonts() {
   const file = (name: string) =>
     readFile(path.join(process.cwd(), "assets/fonts", name));
-  const [monoLight, mono, sans, sansMedium] = await Promise.all([
+  const [monoLight, mono, sans, sansMedium, michroma] = await Promise.all([
     file("martian-mono-latin-300-normal.woff"),
     file("martian-mono-latin-400-normal.woff"),
     file("instrument-sans-latin-400-normal.woff"),
     file("instrument-sans-latin-500-normal.woff"),
+    file("michroma-latin-400-normal.woff"),
   ]);
   return [
     { name: "Martian Mono", data: monoLight, weight: 300 as const },
     { name: "Martian Mono", data: mono, weight: 400 as const },
     { name: "Instrument Sans", data: sans, weight: 400 as const },
     { name: "Instrument Sans", data: sansMedium, weight: 500 as const },
+    { name: "Michroma", data: michroma, weight: 400 as const },
   ];
 }
 

@@ -10,6 +10,8 @@ export default function Image() {
   return renderCard({
     kicker: siteConfig.role,
     title: siteConfig.name,
+    // Michroma, like the name on the home page.
+    titleFont: "display",
     description: siteConfig.description,
   });
 }

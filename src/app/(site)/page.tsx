@@ -1,3 +1,5 @@
+import { Michroma } from "next/font/google";
+
 import { ButtonLink } from "@/components/button-link";
 import { EmptyState } from "@/components/empty-state";
 import { HeroScene } from "@/components/hero/hero-scene";
@@ -12,6 +14,10 @@ import { websiteJsonLd } from "@/lib/json-ld";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({ path: "/" });
+
+// Only the name in the hero uses Michroma, so it's loaded on this page alone.
+// It comes in a single weight.
+const michroma = Michroma({ subsets: ["latin"], weight: "400" });
 
 export default function HomePage() {
   return (
@@ -28,7 +34,9 @@ export default function HomePage() {
               {siteConfig.role}
             </p>
 
-            <h1 className="mt-7 animate-rise font-mono text-[clamp(3.25rem,10.5vw,7rem)] leading-[0.95] font-extralight tracking-[-0.045em] font-stretch-semi-expanded [animation-delay:80ms]">
+            <h1
+              className={`${michroma.className} mt-7 animate-rise text-[clamp(2.75rem,8.2vw,5.6rem)] leading-[1.05] font-normal tracking-[-0.01em] [animation-delay:80ms]`}
+            >
               Tony
               <br />
               <span className="relative ml-[0.85em] text-dust">
@@ -38,9 +46,9 @@ export default function HomePage() {
                     lines the tag up with the cap height at every screen size. */}
                 <span
                   aria-hidden="true"
-                  className="absolute top-[0.2em] -right-2 translate-x-full leading-none"
+                  className="absolute top-[0.38em] -right-2 translate-x-full leading-none"
                 >
-                  <span className="block font-mono text-[0.6rem] font-normal tracking-[0.08em] text-flare font-stretch-normal sm:text-[0.7rem]">
+                  <span className="block font-mono text-[0.6rem] tracking-[0.08em] text-flare sm:text-[0.7rem]">
                     α Lyr
                   </span>
                 </span>

@@ -93,7 +93,8 @@ Live at https://tony-vega-portfolio.vercel.app since 2026-09-16.
 - [x] Migrations run on every deploy (`vercel-build`); production seeded; production admin account created
 - [x] Security headers on every response: Content-Security-Policy, HSTS, nosniff, Referrer-Policy, framing protection, Permissions-Policy, and a same-origin opener policy
 - [x] Smoke test of the live site: pages, headers, robots, sitemap, feed, share cards, the admin locked, and drafts hidden (25 checks, all passing)
-- [ ] **Tony:** turn on two-factor login, and save one edit with an uploaded image on the live site
+- [x] **Tony:** saved an edit with an uploaded image on the live site (Blob with OIDC; see notes)
+- [ ] **Tony:** turn on two-factor login on the live site
 - [ ] Optional: a custom domain (then update `NEXT_PUBLIC_SITE_URL` and redeploy)
 
 **Lighthouse on the live site** (same settings as Phase 4, 2026-09-16, median of three runs):

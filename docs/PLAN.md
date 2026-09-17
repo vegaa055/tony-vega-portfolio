@@ -110,7 +110,7 @@ Largest Contentful Paint is 1.6 to 2.3s on all three pages (under 2.5s counts as
 
 ### Hero nebula
 
-Built on the `hero-nebula` branch, 2026-09-17. The whole hero band is a
+Built on the `hero-nebula` branch and merged on 2026-09-17. The whole hero band is a
 Three.js (WebGL 2) nebula in the site's colors: periwinkle gas around a coral
 core. A small fluid simulation on the GPU carries the clouds, so the cursor
 parts them and leaves a wake that swirls and settles over a few seconds. On
@@ -140,7 +140,9 @@ it, and `nebula/` holds the scene, the simulation, and the shaders.
       text: everything passes, the intro paragraph at 8.6:1.
 - [x] 38 unit tests for the logic that needs no GPU, and 7 end-to-end tests
       (starting, pausing, reduced motion, both fallbacks, links, restart).
-- [ ] **Tony:** try it on a phone and a laptop, then merge.
+- [x] Merged to `main` and deployed; the live site passes its 25 smoke checks.
+- [ ] **Tony:** try it on a phone and a laptop, and say if the wake, the
+      colors, or the core's brightness want tuning.
 
 **Lighthouse, local production builds, real GPU, median of three runs:**
 

@@ -43,7 +43,7 @@ const MARK = svg(
   </svg>`,
 );
 
-// A large, faint orbit for cards without an image, echoing the home page hero.
+// A large, faint orbit for cards without an image, echoing the site's mark.
 const ORBIT = svg(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">
     <g transform="rotate(-24 260 260)" fill="none">

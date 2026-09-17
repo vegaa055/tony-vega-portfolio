@@ -2,7 +2,8 @@ import type { ThemeRegistration } from "shiki/core";
 
 /**
  * Syntax highlighting theme built from the site palette: neutral text, the
- * flare accent for keywords, and the orrery's muted planet colors for the rest.
+ * flare accent for keywords, and muted planet colors (sand, periwinkle, clay,
+ * cream) for the rest.
  * Every token color keeps at least 4.5:1 contrast on the code background.
  */
 export const deepFieldTheme: ThemeRegistration = {

@@ -1,0 +1,116 @@
+/*
+ * The home page hero's backdrop. Layers, bottom to top: a CSS stand-in, the
+ * WebGL canvas (faded in once its first frame is drawn), and a shade that
+ * keeps the text readable. The edges fade out, so the gas never ends in a
+ * hard line against the header or the next section.
+ *
+ * Layout lives here: --core-x and --core-y place the glowing core (0 to 1,
+ * from the left and from the bottom) and --core-size sets its reach in hero
+ * heights. The WebGL scene reads the same values.
+ */
+
+.nebula {
+  /* Narrow screens: the text runs across the top, the gas glows below it. */
+  --core-x: 0.62;
+  --core-y: 0.2;
+  --core-size: 0.2;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 72%,
+    transparent
+  );
+}
+
+/* Wide screens: the text sits on the left, the gas glows to its right. */
+@media (width >= 64rem) {
+  .nebula {
+    --core-x: 0.8;
+    --core-y: 0.5;
+    --core-size: 0.24;
+  }
+}
+
+@media (width >= 80rem) {
+  .nebula {
+    --core-x: 0.76;
+  }
+}
+
+.standIn,
+.stage,
+.shade {
+  position: absolute;
+  inset: 0;
+}
+
+/* Soft light in the nebula's colors: the loading state, and the whole effect
+   where WebGL can't run. */
+.standIn {
+  --at: calc(var(--core-x) * 100%) calc((1 - var(--core-y)) * 100%);
+  background:
+    radial-gradient(
+      calc(var(--core-size) * 90rem) calc(var(--core-size) * 62rem) at var(--at),
+      rgb(255 106 77 / 0.2),
+      transparent 70%
+    ),
+    radial-gradient(
+      calc(var(--core-size) * 150rem) calc(var(--core-size) * 100rem) at
+        var(--at),
+      rgb(124 149 255 / 0.15),
+      transparent 72%
+    ),
+    radial-gradient(
+      calc(var(--core-size) * 260rem) calc(var(--core-size) * 150rem) at
+        var(--at),
+      rgb(40 46 120 / 0.34),
+      transparent 75%
+    );
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.8s var(--ease-out-expo);
+}
+
+.nebula:is(
+    [data-nebula="running"],
+    [data-nebula="paused"],
+    [data-nebula="still"]
+  )
+  .canvas {
+  opacity: 1;
+}
+
+/* Darkens the gas behind the text. */
+.shade {
+  background: linear-gradient(
+    to bottom,
+    rgb(5 6 10 / 0.88),
+    rgb(5 6 10 / 0.74) 55%,
+    rgb(5 6 10 / 0) 82%
+  );
+}
+
+@media (width >= 64rem) {
+  .shade {
+    /* Where the text column starts: the page's side padding, plus the
+       margin once the page is wider than the site's content. */
+    --text-start: max(2rem, calc((100% - 76rem) / 2 + 2rem));
+    background: linear-gradient(
+      to right,
+      rgb(5 6 10 / 0.9) var(--text-start),
+      rgb(5 6 10 / 0.76) calc(var(--text-start) + 32rem),
+      rgb(5 6 10 / 0) calc(var(--text-start) + 48rem)
+    );
+  }
+}

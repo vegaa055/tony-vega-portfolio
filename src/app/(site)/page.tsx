@@ -1,6 +1,6 @@
 import { ButtonLink } from "@/components/button-link";
 import { EmptyState } from "@/components/empty-state";
-import { HeroScene } from "@/components/hero/hero-scene";
+import { HeroNebula } from "@/components/hero/hero-nebula";
 import { JsonLd } from "@/components/json-ld";
 import { PostList } from "@/components/post-list";
 import { ProjectCard } from "@/components/project-card";
@@ -18,9 +18,10 @@ export default function HomePage() {
   return (
     <>
       <JsonLd data={websiteJsonLd()} />
-      <section className="border-b border-line">
-        <div className="mx-auto grid max-w-site items-center gap-12 px-4 pt-14 pb-16 sm:px-8 md:grid-cols-12 md:gap-8 md:pt-20 md:pb-24">
-          <div className="md:col-span-7">
+      <section className="relative isolate overflow-hidden border-b border-line">
+        <HeroNebula />
+        <div className="relative mx-auto flex max-w-site flex-col px-4 pt-14 pb-52 sm:px-8 lg:min-h-[min(46rem,calc(100svh-4rem))] lg:justify-center lg:pt-20 lg:pb-24">
+          <div className="max-w-[40rem]">
             <p className="flex animate-rise items-center gap-3 font-mono text-label tracking-[0.2em] text-dust uppercase">
               <span
                 aria-hidden="true"
@@ -63,9 +64,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="animate-rise [animation-delay:200ms] md:col-span-5">
-            <HeroScene />
-          </div>
+          <p
+            aria-hidden="true"
+            className="absolute right-4 bottom-5 font-mono text-micro tracking-[0.16em] text-faint uppercase sm:right-8"
+          >
+            Fig. 01 — Nebula
+          </p>
         </div>
       </section>
 

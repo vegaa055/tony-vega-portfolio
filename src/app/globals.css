@@ -8,7 +8,7 @@
  * carries everything meant to be read.
  *
  * `static` keeps every token available as a CSS variable, including ones only
- * referenced from CSS modules (e.g. the hero placeholder).
+ * referenced from CSS modules (e.g. the hero nebula).
  */
 @theme static {
   --color-*: initial;

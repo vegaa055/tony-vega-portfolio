@@ -37,7 +37,12 @@ vec2 top() { return vUv + vec2(0.0, uTexel.y); }
 vec2 bottom() { return vUv - vec2(0.0, uTexel.y); }
 `;
 
-/** Adds a soft round push (or glow) to a field. */
+/**
+ * Draws the moving body into a field: gas near it is carried toward the
+ * body's own velocity (or glow), rather than shoved harder on every frame.
+ * `uPart` is how much of the way there one frame goes, which keeps the effect
+ * the same whether the device draws 30 or 144 frames a second.
+ */
 export const SPLAT = /* glsl */ `
 ${HEADER}
 uniform sampler2D uTarget;
@@ -45,14 +50,15 @@ uniform float uAspect;
 uniform vec2 uPoint;
 uniform vec3 uValue;
 uniform float uRadius;
+uniform float uPart;
 in vec2 vUv;
 out vec4 outColor;
 
 void main() {
   vec2 offset = vUv - uPoint;
   offset.x *= uAspect;
-  vec3 splat = exp(-dot(offset, offset) / uRadius) * uValue;
-  outColor = vec4(texture(uTarget, vUv).xyz + splat, 1.0);
+  float reach = exp(-dot(offset, offset) / uRadius) * uPart;
+  outColor = vec4(mix(texture(uTarget, vUv).xyz, uValue, reach), 1.0);
 }
 `;
 
@@ -367,7 +373,7 @@ void main() {
 
   // Gas that something just passed through glows for a moment. The glow is
   // capped, so circling one spot doesn't burn it white.
-  color += mix(PALE, PEACH, core) * min(heat, 0.6) * (0.08 + gas) * 0.45;
+  color += mix(PALE, PEACH, core) * min(heat, 0.5) * (0.08 + gas) * 0.3;
 
   color = min(color, vec3(1.0));
   float alpha = min(max(color.r, max(color.g, color.b)) * 1.15, 1.0);

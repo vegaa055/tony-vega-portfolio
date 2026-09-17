@@ -34,17 +34,19 @@ import {
 } from "./shaders";
 
 // How the gas behaves. Dissipation is per second.
-const VELOCITY_DISSIPATION = 1.3;
+const VELOCITY_DISSIPATION = 1.6;
 const HEAT_DISSIPATION = 1.5;
 const PRESSURE_FADE = 0.8;
 const SWIRL = 12;
 // How quickly disturbed clouds settle back (per second).
 const HEAL = 0.5;
-// The share of the body's speed the gas picks up.
-const PUSH = 0.36;
+// The share of the body's speed the gas is carried toward.
+const PUSH = 0.45;
+// How quickly gas around the body picks that speed up (per second).
+const GRAB = 18;
 // Size of the body pushing through the gas (a variance, in hero heights²).
 const SPLAT_RADIUS = 0.003;
-const HEAT_RADIUS = 0.0018;
+const HEAT_RADIUS = 0.0012;
 
 /** A shader pass with a named set of uniforms. */
 export function pass(
@@ -157,6 +159,7 @@ function createPasses(aspect: number, texel: Vector2) {
       uPoint: new Vector2(),
       uValue: new Vector3(),
       uRadius: SPLAT_RADIUS,
+      uPart: 0,
     }),
     curl: pass(CURL, { uTexel: texel, uVelocity: none }),
     vorticity: pass(VORTICITY, {
@@ -270,6 +273,8 @@ export class Fluid {
       this.#screen.draw(this.#renderer, material, to);
     const p = this.#passes;
 
+    // One frame's share of the way toward the body's speed.
+    p.splat.uniforms.uPart.value = 1 - Math.exp(-GRAB * dt);
     for (const splat of splats) {
       p.splat.uniforms.uPoint.value.set(splat.x, splat.y);
 

@@ -60,8 +60,8 @@ describe("splatsAlong", () => {
     // 0.3 hero heights a second, in texels: 0.3 * 100.
     expect(slow[0].dy).toBeCloseTo(30);
     const total = Math.hypot(teleport[0].dx, teleport[0].dy);
-    // At most 5 hero heights a second, shared across the pushes.
-    expect(total).toBeCloseTo((5 * 100) / Math.sqrt(teleport.length));
+    // At most 5 hero heights a second.
+    expect(total).toBeCloseTo(5 * 100);
   });
 
   it("scales the push and the glow by strength", () => {

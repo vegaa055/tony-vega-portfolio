@@ -9,6 +9,7 @@ https://www.tonyvega.io
 - **Markdown** content rendered on the server, with Shiki code highlighting
 - **Better Auth** for the admin login, with optional two-factor login
 - **Vercel Blob** for images uploaded in production
+- **Three.js** (WebGL 2) for the nebula behind the home page's hero
 
 The full plan, decisions, and phase checklist are in [docs/PLAN.md](docs/PLAN.md).
 
@@ -175,7 +176,8 @@ src/
     globals.css          design tokens ("Deep Field"), base and Markdown styles
   components/            page shell and shared UI
     admin/               admin shell, editors, and form fields
-    hero/                the hero slot and its CSS-only placeholder
+    hero/                the home page's nebula: when to load it, and the
+                         scene, fluid simulation, and shaders in nebula/
   config/site.ts         site name, navigation, links, section headers
   data/                  server-only reads (cached for pages; uncached for the admin)
   db/

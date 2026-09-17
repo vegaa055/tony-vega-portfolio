@@ -5,7 +5,7 @@
  */
 export type Point = { x: number; y: number };
 
-/** A push on the gas at one spot, in simulation texels per second. */
+/** The body at one spot on its path, in simulation texels per second. */
 export type Splat = {
   x: number;
   y: number;
@@ -58,13 +58,14 @@ export function splatsAlong(
   const splats: Splat[] = [];
   for (let i = 1; i <= count; i++) {
     const t = i / count;
+    // Every push carries the body's own speed: the gas is drawn toward it,
+    // so overlapping pushes don't pile up.
     splats.push({
       x: from.x + (to.x - from.x) * t,
       y: from.y + (to.y - from.y) * t,
-      // Overlapping pushes add up, so each carries a share.
-      dx: vx / Math.sqrt(count),
-      dy: vy / Math.sqrt(count),
-      heat: heat / Math.sqrt(count),
+      dx: vx,
+      dy: vy,
+      heat,
     });
   }
   return splats;

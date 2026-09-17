@@ -20,6 +20,7 @@ before the next phase starts.
 | Images | Vercel Blob | Built into Vercel. |
 | Writing format | Markdown with live preview | Portable and easy to back up. |
 | Admin approach | Custom-built | Three content types don't need a full CMS, and the admin itself is portfolio work. |
+| Hero | Three.js nebula (WebGL 2) | Reacts to the cursor like gas being passed through. Loads after the page is up, with a CSS stand-in for everyone else. |
 | Look | "Cosmic dark" | Deep-space neutrals, one warm accent, Martian Mono + Instrument Sans. Michroma for the home page heading and for project and post titles wherever they appear, including share cards (`src/lib/fonts.ts`). |
 | Name | Tony Vega | At www.tonyvega.io; `NEXT_PUBLIC_SITE_URL` sets the address. |
 | Older projects | Imported as hidden drafts | 7 from the Flask portfolio + 3 games from the static site. |
@@ -107,17 +108,68 @@ Live since 2026-09-16 at https://www.tonyvega.io. The first address, https://ton
 
 Largest Contentful Paint is 1.6 to 2.3s on all three pages (under 2.5s counts as good). The home page scores lower (72 to 90) only on Speed Index and main-thread time: the orrery placeholder never stops moving, so Lighthouse can't call the page visually finished, and its 3D transforms keep the test browser busy. See the note under "Later: 3D hero".
 
-### Later: 3D hero
+### Hero nebula
 
-Swap the placeholder in `src/components/hero/hero-scene.tsx` for a Three.js
-`WebGPURenderer` scene (falls back to WebGL 2 automatically). Load it client-side
-only, and keep the placeholder as the loading state and the reduced-motion
-fallback.
+Built on the `hero-nebula` branch, 2026-09-17. The whole hero band is a
+Three.js (WebGL 2) nebula in the site's colors: periwinkle gas around a coral
+core. A small fluid simulation on the GPU carries the clouds, so the cursor
+parts them and leaves a wake that swirls and settles over a few seconds. On
+touch screens, and whenever the mouse rests for five seconds, an unseen
+drifter crosses the gas every 13 seconds instead.
 
-Motion that never stops costs the home page in Lighthouse (Speed Index keeps
-climbing while anything moves; see the Phase 5 scores). Start the scene's motion
-after the page has loaded, pause it while it's off screen or the tab is hidden,
-and check the home page's Lighthouse score before and after.
+The code is in `src/components/hero/`: `hero-nebula.tsx` decides when to load
+it, and `nebula/` holds the scene, the simulation, and the shaders.
+
+- [x] Three.js loads only on the home page, and only after the page is up: on
+      the first interaction, or three seconds after loading. A CSS stand-in in
+      the same colors shows until then.
+- [x] The stand-in stays for browsers without WebGL 2 or float render targets,
+      for GPUs that draw on the CPU (SwiftShader, llvmpipe, Microsoft Basic
+      Render Driver), and for visitors asking to save data.
+- [x] Reduced motion gets a still frame, and switches over live if the setting
+      changes.
+- [x] Pauses off screen and in hidden tabs. Touch devices draw at 30 frames a
+      second; fast displays are held to 60. Quality (canvas size, simulation
+      grid, pressure passes) steps down after 90 slow frames and never climbs
+      back, so the picture can't flicker between levels.
+- [x] The push is measured against time, not frames, so the wake looks the
+      same at 30, 60, or 144 frames a second, and gas near the body is carried
+      toward its speed rather than shoved harder every frame.
+- [x] Text contrast over the nebula, measured from screenshots at seven widths
+      from 360 to 1920px, still and right after stirring the gas behind the
+      text: everything passes, the intro paragraph at 8.6:1.
+- [x] 38 unit tests for the logic that needs no GPU, and 7 end-to-end tests
+      (starting, pausing, reduced motion, both fallbacks, links, restart).
+- [ ] **Tony:** try it on a phone and a laptop, then merge.
+
+**Lighthouse, local production builds, real GPU, median of three runs:**
+
+| Build | Phone | Desktop | LCP (desktop) | Total Blocking Time |
+| --- | --- | --- | --- | --- |
+| `main` | 93 | 93 | 2.1s | 48ms / 36ms |
+| `hero-nebula` | 93 | 93 | 2.0s | 49ms / 53ms |
+
+The scores don't move because Lighthouse never interacts and finishes before
+the three-second timer: it measures the CSS stand-in. The nebula's real cost
+is a 134 KB (gzipped) chunk for Three.js and the scene, fetched after the page
+is interactive, and about 0.3ms of main-thread work per frame on a desktop GPU.
+
+Where to tune it:
+
+- **How the gas behaves:** the constants at the top of `nebula/fluid.ts` (how
+  much speed the gas takes from the body, how fast it slows, swirl, and how
+  quickly clouds settle back).
+- **Colors and composition:** `COMPOSITE` in `nebula/shaders.ts`; the clouds
+  themselves are drawn once by `CLOUDS`, which tiles so they can drift forever.
+- **Layout:** `hero-nebula.module.css` owns `--core-x`, `--core-y` and
+  `--core-size` (where the core glows, per breakpoint), and the scene reads
+  the same values, so the CSS stand-in and the nebula always agree.
+- **When it loads:** `START_AFTER_MS` and the trigger events in
+  `hero-nebula.tsx`. Loading sooner would put Three.js inside Lighthouse's
+  measured window.
+
+End-to-end tests run in browsers that draw WebGL on the CPU, which the nebula
+normally declines; they set `window.__nebulaAllowSoftware` to let it run there.
 
 ## Notes for later phases
 

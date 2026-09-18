@@ -26,7 +26,7 @@ function siteUrl() {
 
 export const siteConfig = {
   name: "Tony Vega",
-  role: "Software developer",
+  role: "Full-stack developer",
   description:
     "Tony Vega builds interactive simulations, software synthesizers, and web applications.",
   url: siteUrl(),

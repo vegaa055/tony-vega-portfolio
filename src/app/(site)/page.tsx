@@ -52,8 +52,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-8 max-w-[34rem] animate-rise text-lg leading-relaxed text-dust [animation-delay:160ms] sm:text-xl">
-              I build interactive simulations, software synthesizers, and web
-              applications, and I write about how they work.
+              Full-stack developer building simulations, games, audio software, and web apps.
             </p>
 
             <div className="mt-10 flex animate-rise flex-wrap items-center gap-3 [animation-delay:240ms]">
